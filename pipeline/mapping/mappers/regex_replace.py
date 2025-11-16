@@ -13,35 +13,10 @@ from typing import Dict, List, Tuple
 import pandas as pd
 
 from ...utils.text import normalize_string
+from ...constants import REGEX_REPLACEMENTS
 
 
-REPLACEMENTS: List[Tuple[str, str]] = [
-    # Handle special title phrases first (e.g. "Landeshauptstadt", "Hansestadt")
-    (r"\bHanse- und Universitätsstadt\b", "Kreisfreie Stadt"),
-    (r"\bLandeshauptstadt\b", "Kreisfreie Stadt"),
-    (r"\bLandeshauptstadt\b", "Stadtkreis"),
-    (r"\bdocumenta-Stadt\b", "Kreisfreie Stadt"),
-    (r"\bHansestadt\b", "Kreisfreie Stadt"),
-    (r"\bUniversitätsstadt\b", "Stadtkreis"),
-    (r"\bWissenschaftsstadt\b", "Kreisfreie Stadt"),
-    (r"\bStadt der FernUniversität\b", "Kreisfreie Stadt"),
-    (r"\bFreie und Hansestadt\b", ""),
-    # More general replacements for titles and abbreviations
-    (r"\bStadt\b", "Kreisfreie Stadt"),
-    (r"\bWissenschaftsstadt\b", ""),
-    (r"\bStadt\b", "Stadtkreis"),
-    (r"\bStadt\b", ""),
-    (r"\bLandkreis\b", ""),
-    (r"\bBL\b", ""),
-    (r"\bDE\b", ""),
-    (r"\bKreis\b", ""),
-    (r"\bin der\b", "i. d."),
-    (r"\bi\. d\.\b", "in der"),
-    (r"\ban der\b", "a. d."),
-    (r"\ba\. d\.\b", "an der"),
-    (r"\bam\b", "a."),
-    (r"\ba\.\b", "am"),
-]
+REPLACEMENTS: List[Tuple[str, str]] = list(REGEX_REPLACEMENTS)
 
 # Optional: already-used geodata IDs per CSV, set by the orchestrator.
 USED_IDS_BY_SOURCE: Dict[str, set[str]] = {}

@@ -18,19 +18,13 @@ import logging
 import pandas as pd
 
 from ...utils.text import normalize_string
+from ...constants import SUFFIX_TITLE_WORDS
 
 
 logger = logging.getLogger(__name__)
 
 
-TITLE_WORDS = [
-    "Stadtkreis",
-    "Landkreis",
-    "Kreisfreie Stadt",
-    "DE",
-    "Eifelkreis",
-    "Stadt",
-]
+TITLE_WORDS = list(SUFFIX_TITLE_WORDS)
 
 # Optional: already-used geodata IDs per CSV, set by the orchestrator.
 USED_IDS_BY_SOURCE: Dict[str, set[str]] = {}

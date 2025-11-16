@@ -14,6 +14,7 @@ from .storage import (
     set_export_geodata_source,
     get_auto_export_source,
 )
+from .constants import PROMPT_SELECT_EXPORT_SOURCE
 
 
 logger = logging.getLogger(__name__)
@@ -71,13 +72,13 @@ def _choose_single_geodata_source(usage: List[Tuple[str, int, float, int, float,
             )
             choices.append(Choice(title=title, value=source))
         selected = questionary.select(
-            "Which geodata source should be used for manual mapping and export?",
+            PROMPT_SELECT_EXPORT_SOURCE,
             choices=choices,
         ).ask()
     except Exception:
         # Fallback without Choice helper: simple labels only
         selected = questionary.select(
-            "Which geodata source should be used for manual mapping and export?",
+            PROMPT_SELECT_EXPORT_SOURCE,
             choices=[source for source, _hits, _pct in usage],
         ).ask()
 

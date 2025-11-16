@@ -33,6 +33,7 @@ from .mappers.fuzzy_confident import fuzzy_confident_mapper
 from .mappers.token_permutation import token_permutation_mapper
 from .selection import select_mappers_step
 from ..utils.text import normalize_many
+from ..constants import DEFAULT_MAPPERS
 
 logger = logging.getLogger(__name__)
 
@@ -43,14 +44,7 @@ def _selected_mappers() -> list[str]:
     selected = get_selected_mappers()
     if not selected:
         # Default execution order if no mapper selection was stored
-        return [
-            "id_exact",
-            "unique_name",
-            "token_permutation",
-            "regex_replace",
-            "suffix_variants",
-            "fuzzy_confident",
-        ]
+        return list(DEFAULT_MAPPERS)
     return selected
 
 
@@ -101,14 +95,7 @@ def mapping_step(dataframe: pd.DataFrame) -> pd.DataFrame:
     }
     selected = [m for m in _selected_mappers() if m in name_to_mapper]
     if not selected:
-        selected = [
-            "id_exact",
-            "unique_name",
-            "token_permutation",
-            "regex_replace",
-            "suffix_variants",
-            "fuzzy_confident",
-        ]
+        selected = list(DEFAULT_MAPPERS)
 
     total_rows = len(dataframe)
 

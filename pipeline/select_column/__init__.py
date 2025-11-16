@@ -12,6 +12,13 @@ from ..storage import (
     set_value_columns,
     get_selections,
 )
+from ..constants import (
+    PROMPT_SELECT_ID_COLUMN,
+    PROMPT_SELECT_NAME_COLUMN,
+    PROMPT_SELECT_VALUE_COLUMNS,
+    ID_NONE_LABEL,
+    NAME_NONE_LABEL,
+)
 
 
 def _first_non_empty_value(series: pd.Series) -> str | None:
@@ -54,8 +61,8 @@ def _choose_columns(
 
     column_choices = _build_column_choices(dataframe)
 
-    id_none_label = "<Do not use an ID column>"
-    name_none_label = "<Do not use a name column>"
+    id_none_label = ID_NONE_LABEL
+    name_none_label = NAME_NONE_LABEL
 
     # The 'none/unknown' options should always be shown first and be selected by default.
     id_default = id_none_label
@@ -71,12 +78,12 @@ def _choose_columns(
     ]
 
     id_column = questionary.select(
-        "Which column contains the IDs?",
+        PROMPT_SELECT_ID_COLUMN,
         choices=id_choices,
         default=id_default,
     ).ask()
     name_column = questionary.select(
-        "Which column contains the names?",
+        PROMPT_SELECT_NAME_COLUMN,
         choices=name_choices,
         default=name_default,
     ).ask()
@@ -101,10 +108,13 @@ def _choose_columns(
     ]
     value_columns: list[str] = []
     if remaining_for_values:
-        value_columns = list(questionary.checkbox(
-            "Which columns contain values that should be included in the export? (optional)",
-            choices=remaining_for_values,
-        ).ask() or [])
+        value_columns = list(
+            questionary.checkbox(
+                PROMPT_SELECT_VALUE_COLUMNS,
+                choices=remaining_for_values,
+            ).ask()
+            or []
+        )
 
     return id_column, name_column, list(value_columns)
 

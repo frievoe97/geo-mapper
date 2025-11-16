@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional, List
 
+import pandas as pd
 import questionary
 
 from ..storage import (
@@ -13,10 +14,15 @@ from ..storage import (
     set_nuts_level,
     get_selections,
 )
-
-GEODATA_CSV_ROOT = Path("geodata_clean") / "csv"
-UNKNOWN_OPTION = "unknown"
-DATASET_CHOICES = ("NUTS", "LAU")
+from ..constants import (
+    GEODATA_CSV_ROOT,
+    UNKNOWN_OPTION,
+    DATASET_CHOICES,
+    LEVEL_TITLES,
+    LEVEL_VALUES,
+    PROMPT_SELECT_GEODATA_LEVEL,
+    PROMPT_SELECT_GEODATA_VERSION,
+)
 
 
 def _dataset_dir_for_level(level_choice: str) -> Optional[Path]:
@@ -115,7 +121,7 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
                         version_choices[1] if len(version_choices) > 1 else UNKNOWN_OPTION
                     )
                     version_choice = _prompt_select(
-                        f"Choose the version (year) for {level_choice_from_meta}:",
+                        PROMPT_SELECT_GEODATA_VERSION.format(level=level_choice_from_meta),
                         version_choices,
                         version_default,
                     )
@@ -126,14 +132,8 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
     try:
         from questionary import Choice
 
-        level_titles = {
-            "NUTS 0": "NUTS 0 (Deutschland gesamt)",
-            "NUTS 1": "NUTS 1 (Bundesländer)",
-            "NUTS 2": "NUTS 2 (Regionen / Regierungsbezirke)",
-            "NUTS 3": "NUTS 3 (Landkreise / kreisfreie Städte)",
-            "LAU": "LAU (Gemeinden)",
-        }
-        level_values: List[str] = ["NUTS 0", "NUTS 1", "NUTS 2", "NUTS 3", "LAU"]
+        level_titles = LEVEL_TITLES
+        level_values: List[str] = list(LEVEL_VALUES)
         level_choices = [Choice(title=UNKNOWN_OPTION, value=UNKNOWN_OPTION)]
         for value in level_values:
             title = level_titles.get(value, value)
@@ -141,26 +141,20 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         # Default by internal value, not by label
         default_value = "NUTS 3"
         level_choice = questionary.select(
-            "Which geodata level do you want to use?",
+            PROMPT_SELECT_GEODATA_LEVEL,
             choices=level_choices,
             default=default_value,
         ).ask()
     except Exception:
         # Fallback without Choice helper: use descriptive labels and map back to internal values
-        level_titles = {
-            "NUTS 0": "NUTS 0 (Deutschland gesamt)",
-            "NUTS 1": "NUTS 1 (Bundesländer)",
-            "NUTS 2": "NUTS 2 (Regionen / Regierungsbezirke)",
-            "NUTS 3": "NUTS 3 (Landkreise / kreisfreie Städte)",
-            "LAU": "LAU (Gemeinden)",
-        }
-        level_values_fallback: List[str] = ["NUTS 0", "NUTS 1", "NUTS 2", "NUTS 3", "LAU"]
+        level_titles = LEVEL_TITLES
+        level_values_fallback: List[str] = list(LEVEL_VALUES)
         # Build display labels including the German description
         level_labels = [level_titles[v] for v in level_values_fallback]
         level_choices_fb = _with_unknown(level_labels)
         default_label = level_titles.get("NUTS 3", "NUTS 3")
         level_choice = _prompt_select(
-            "Which geodata level do you want to use?",
+            PROMPT_SELECT_GEODATA_LEVEL,
             level_choices_fb,
             default_label,
         )
@@ -205,7 +199,7 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         version_choices[1] if len(version_choices) > 1 else UNKNOWN_OPTION
     )
     version_choice = _prompt_select(
-        f"Choose the version (year) for {level_choice}:",
+        PROMPT_SELECT_GEODATA_VERSION.format(level=level_choice),
         version_choices,
         version_default,
     )

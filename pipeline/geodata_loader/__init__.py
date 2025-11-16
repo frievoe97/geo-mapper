@@ -9,10 +9,7 @@ from typing import List, Optional
 import pandas as pd
 
 from ..storage import get_selections, set_geodata_frames
-
-from ..geodata_selection import DATASET_CHOICES, UNKNOWN_OPTION
-
-GEODATA_CSV_ROOT = Path("geodata_clean") / "csv"
+from ..constants import GEODATA_CSV_ROOT, DATASET_CHOICES, UNKNOWN_OPTION
 
 logger = logging.getLogger(__name__)
 

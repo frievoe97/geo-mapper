@@ -17,6 +17,15 @@ from .storage import (
     get_geodata_frames,
     get_selections,
 )
+from .constants import (
+    PROMPT_MANUAL_SELECT_INPUT,
+    PROMPT_MANUAL_SEARCH_GEODATA,
+    PROMPT_MANUAL_SELECT_GEODATA,
+    LABEL_MANUAL_UNDO_LAST,
+    LABEL_MANUAL_DONE,
+    LABEL_MANUAL_NO_MAPPING,
+    CURSES_MANUAL_HELP,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -87,7 +96,7 @@ def _manual_mapping_curses_loop(
     # Stack for undo: stores indices of the most recently mapped input rows
     history: List[object] = []
 
-    message = "TAB/←→: switch pane, ↑/↓: move, ENTER: map, u: undo, q: finish"
+    message = CURSES_MANUAL_HELP
 
     while True:
         height, width = stdscr.getmaxyx()
@@ -320,16 +329,14 @@ def _run_questionary_manual_mapping(
 
         choices: List[Choice] = []
         if history:
-            choices.append(
-                Choice("↩ Undo last manual mapping", value=_UNDO_SENTINEL)
-            )
+            choices.append(Choice(LABEL_MANUAL_UNDO_LAST, value=_UNDO_SENTINEL))
         for idx in unmapped_indices[:30]:
             val = dataframe.loc[idx, source_col]
             choices.append(Choice(f"[{idx}] {val}", value=idx))
-        choices.append(Choice("Done (no further manual mappings)", value=_DONE_SENTINEL))
+        choices.append(Choice(LABEL_MANUAL_DONE, value=_DONE_SENTINEL))
 
         selected = questionary.select(
-            "Which input value do you want to map manually?",
+            PROMPT_MANUAL_SELECT_INPUT,
             choices=choices,
         ).ask()
         return selected
@@ -349,9 +356,7 @@ def _run_questionary_manual_mapping(
             logger.info("All geodata entries in this CSV are already mapped.")
             return None, None
 
-        search = questionary.text(
-            "Optional: search term for geodata names (leave empty to list all):"
-        ).ask()
+        search = questionary.text(PROMPT_MANUAL_SEARCH_GEODATA).ask()
 
         candidates = base_candidates
         if search:
@@ -368,10 +373,10 @@ def _run_questionary_manual_mapping(
             gid = str(row["id"])
             name = str(row["name"])
             choices.append(Choice(f"{gid} – {name}", value=(gid, name)))
-        choices.append(Choice("No mapping / back", value=(None, None)))
+        choices.append(Choice(LABEL_MANUAL_NO_MAPPING, value=(None, None)))
 
         selected = questionary.select(
-            "Choose the matching geodata entry:", choices=choices
+            PROMPT_MANUAL_SELECT_GEODATA, choices=choices
         ).ask()
         if not selected:
             return None, None
@@ -440,10 +445,10 @@ def _select_unmapped_row(mapping_df: pd.DataFrame, dataframe: pd.DataFrame, sour
     for idx in unmapped_indices[:30]:
         val = dataframe.loc[idx, source_col]
         choices.append(Choice(f"[{idx}] {val}", value=idx))
-    choices.append(Choice("Done (no further manual mappings)", value=_DONE_SENTINEL))
+    choices.append(Choice(LABEL_MANUAL_DONE, value=_DONE_SENTINEL))
 
     selected = questionary.select(
-        "Which input value do you want to map manually?",
+        PROMPT_MANUAL_SELECT_INPUT,
         choices=choices,
     ).ask()
     return selected
@@ -471,9 +476,7 @@ def _select_geodata_target(
         return None, None
 
     # Optional search term to narrow down candidates
-    search = questionary.text(
-        "Optional: search term for geodata names (leave empty to list all):"
-    ).ask()
+    search = questionary.text(PROMPT_MANUAL_SEARCH_GEODATA).ask()
 
     candidates = base_candidates
     if search:
@@ -491,10 +494,10 @@ def _select_geodata_target(
         gid = str(row["id"])
         name = str(row["name"])
         choices.append(Choice(f"{gid} – {name}", value=(gid, name)))
-    choices.append(Choice("No mapping / back", value=(None, None)))
+    choices.append(Choice(LABEL_MANUAL_NO_MAPPING, value=(None, None)))
 
     selected = questionary.select(
-        "Choose the matching geodata entry:", choices=choices
+        PROMPT_MANUAL_SELECT_GEODATA, choices=choices
     ).ask()
 
     if not selected:

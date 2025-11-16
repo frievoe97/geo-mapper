@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List, Set
 
 import pandas as pd
+
 from .storage import (
     get_selections,
     get_geodata_frames,
@@ -16,11 +17,10 @@ from .storage import (
     get_export_geodata_source,
     get_meta_config,
 )
+from .constants import RESULTS_ROOT, MAPPER_PRIORITY
 
 
 logger = logging.getLogger(__name__)
-
-RESULTS_ROOT = Path("results")
 
 
 def _write_mapped_pairs(
@@ -92,14 +92,7 @@ def _write_mapped_pairs(
         export_cols = base_cols + list(value_cols)
         out_df = pd.DataFrame(rows, columns=export_cols)
         # Mapper order in the export: first id_exact, then unique_name, ...
-        mapper_priority = {
-            "id_exact": 0,
-            "unique_name": 1,
-            "token_permutation": 2,
-            "regex_replace": 3,
-            "suffix_variants": 4,
-            "fuzzy_confident": 5,
-        }
+        mapper_priority = MAPPER_PRIORITY
         out_df["_mapper_order"] = out_df["mapper"].map(mapper_priority).fillna(len(mapper_priority))
         out_df = out_df.sort_values("_mapper_order", kind="stable").drop(columns=["_mapper_order"])
     else:

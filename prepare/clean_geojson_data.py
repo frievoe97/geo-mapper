@@ -7,10 +7,17 @@ from pathlib import Path
 
 from pyproj import Transformer
 
-BASE_IN = Path("geodata_raw")
-BASE_OUT = Path("geodata_clean")
-GEO_OUT = BASE_OUT / "geojson"
-CSV_OUT = BASE_OUT / "csv"
+from pipeline.constants import (
+    GEODATA_RAW_ROOT,
+    GEODATA_CLEAN_ROOT,
+    GEOJSON_ROOT,
+    GEODATA_CSV_ROOT,
+)
+
+BASE_IN = GEODATA_RAW_ROOT
+BASE_OUT = GEODATA_CLEAN_ROOT
+GEO_OUT = GEOJSON_ROOT
+CSV_OUT = GEODATA_CSV_ROOT
 logger = logging.getLogger(__name__)
 
 LAU_IN = BASE_IN / "lau"

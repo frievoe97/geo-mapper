@@ -10,6 +10,7 @@ import pandas as pd
 import questionary
 
 from ..storage import set_input_name
+from ..constants import PROMPT_SELECT_WORKSHEET
 
 
 logger = logging.getLogger(__name__)
@@ -52,7 +53,7 @@ def _load_excel(path: Path) -> pd.DataFrame:
         raise ValueError(f"Excel file has no sheets: {path}")
     default_sheet = sheets[0]
     chosen = questionary.select(
-        "Select the worksheet (sheet) to load:",
+        PROMPT_SELECT_WORKSHEET,
         choices=sheets,
         default=default_sheet,
     ).ask()

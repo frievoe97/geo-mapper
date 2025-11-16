@@ -6,16 +6,7 @@ import pandas as pd
 import questionary
 
 from ..storage import get_selections, set_selected_mappers, get_auto_select_mappers
-
-
-DEFAULT_MAPPERS = [
-    "id_exact",
-    "unique_name",
-    "token_permutation",
-    "regex_replace",
-    "suffix_variants",
-    "fuzzy_confident",
-]
+from ..constants import DEFAULT_MAPPERS, PROMPT_SELECT_MAPPERS
 
 
 def _default_mappers_for(selections) -> list[str]:
@@ -65,13 +56,13 @@ def select_mappers_step(dataframe: pd.DataFrame) -> pd.DataFrame:
             Choice("fuzzy_confident", checked=has_name),
         ]
         selected = questionary.checkbox(
-            "Which mapping steps should be executed?",
+            PROMPT_SELECT_MAPPERS,
             choices=choices,
         ).ask()
     except Exception:
         # Fallback if Choice is not available
         selected = questionary.checkbox(
-            "Which mapping steps should be executed?",
+            PROMPT_SELECT_MAPPERS,
             choices=list(DEFAULT_MAPPERS),
         ).ask()
 
