@@ -17,7 +17,6 @@ from ..storage import (
 from ..constants import (
     GEODATA_CSV_ROOT,
     UNKNOWN_OPTION,
-    DATASET_CHOICES,
     LEVEL_TITLES,
     LEVEL_VALUES,
     PROMPT_SELECT_GEODATA_LEVEL,

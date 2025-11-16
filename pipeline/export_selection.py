@@ -20,7 +20,7 @@ from .constants import PROMPT_SELECT_EXPORT_SOURCE
 logger = logging.getLogger(__name__)
 
 
-def _geodata_usage(dataframe: pd.DataFrame) -> List[Tuple[str, int, float, int, float, int]]:
+def _geodata_usage() -> List[Tuple[str, int, float, int, float, int]]:
     """Return per-geodata usage as (source_path, hits, pct_input, geodata_hits, pct_geodata, geodata_total_rows).
 
     Prefer the per-CSV cumulative counts recorded during the mapping step so
@@ -87,7 +87,7 @@ def _choose_single_geodata_source(usage: List[Tuple[str, int, float, int, float,
 
 def select_export_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
     """Pipeline step: select a single geodata CSV for downstream steps."""
-    usage = _geodata_usage(dataframe)
+    usage = _geodata_usage()
     if not usage:
         logger.info(
             "No mapped rows found – no single geodata source will be selected for export.",

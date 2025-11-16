@@ -62,28 +62,30 @@ def _manual_mapping_curses_loop(
         """Build filtered lists for input rows and available geodata rows."""
         # Unmapped input rows
         unmapped_mask = mapping_df["mapped_value"].isna()
-        input_items: List[Tuple[object, str]] = []
-        for idx in mapping_df.index[unmapped_mask]:
-            val = str(dataframe.loc[idx, source_col])
-            if input_search and input_search.lower() not in val.lower():
+        input_rows: List[Tuple[object, str]] = []
+        for row_index in mapping_df.index[unmapped_mask]:
+            row_value = str(dataframe.loc[row_index, source_col])
+            if input_search and input_search.lower() not in row_value.lower():
                 continue
-            input_items.append((idx, val))
+            input_rows.append((row_index, row_value))
 
         # Geodata IDs that are still free (not used in this CSV)
         used_ids = set(str(v) for v in mapping_df["mapped_value"].dropna().astype(str))
-        geo_items: List[Tuple[str, str]] = []
+        geo_rows: List[Tuple[str, str]] = []
         if {"id", "name"}.issubset(geodata_frame.columns):
-            for gid, name in zip(geodata_frame["id"], geodata_frame["name"], strict=False):
-                if pd.isna(gid):
+            for geo_id, geo_name in zip(
+                geodata_frame["id"], geodata_frame["name"], strict=False
+            ):
+                if pd.isna(geo_id):
                     continue
-                gid_str = str(gid)
-                if gid_str in used_ids:
+                geo_id_str = str(geo_id)
+                if geo_id_str in used_ids:
                     continue
-                name_str = str(name)
-                if geo_search and geo_search.lower() not in name_str.lower():
+                geo_name_str = str(geo_name)
+                if geo_search and geo_search.lower() not in geo_name_str.lower():
                     continue
-                geo_items.append((gid_str, name_str))
-        return input_items, geo_items
+                geo_rows.append((geo_id_str, geo_name_str))
+        return input_rows, geo_rows
 
     input_items, geo_items = _build_lists()
 
@@ -332,9 +334,9 @@ def _run_questionary_manual_mapping(
         choices: List[Choice] = []
         if history:
             choices.append(Choice(LABEL_MANUAL_UNDO_LAST, value=_UNDO_SENTINEL))
-        for idx in unmapped_indices[:30]:
-            val = dataframe.loc[idx, source_col]
-            choices.append(Choice(f"[{idx}] {val}", value=idx))
+        for row_index in unmapped_indices[:30]:
+            row_value = dataframe.loc[row_index, source_col]
+            choices.append(Choice(f"[{row_index}] {row_value}", value=row_index))
         choices.append(Choice(LABEL_MANUAL_DONE, value=_DONE_SENTINEL))
 
         selected = questionary.select(
@@ -372,9 +374,9 @@ def _run_questionary_manual_mapping(
 
         choices: List[Choice] = []
         for _, row in candidates.head(30).iterrows():
-            gid = str(row["id"])
-            name = str(row["name"])
-            choices.append(Choice(f"{gid} – {name}", value=(gid, name)))
+            geo_id = str(row["id"])
+            geo_name = str(row["name"])
+            choices.append(Choice(f"{geo_id} – {geo_name}", value=(geo_id, geo_name)))
         choices.append(Choice(LABEL_MANUAL_NO_MAPPING, value=(None, None)))
 
         selected = questionary.select(

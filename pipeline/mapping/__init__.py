@@ -12,7 +12,6 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from .mappers.sorted_tokens import sorted_tokens_mapper
 from ..storage import (
     get_geodata_frames,
     get_selections,
@@ -31,7 +30,6 @@ from .mappers.regex_replace import (
 )
 from .mappers.fuzzy_confident import fuzzy_confident_mapper
 from .mappers.token_permutation import token_permutation_mapper
-from .selection import select_mappers_step
 from ..utils.text import normalize_many
 from ..constants import DEFAULT_MAPPERS
 
@@ -160,7 +158,6 @@ def mapping_step(dataframe: pd.DataFrame) -> pd.DataFrame:
                 if "normalized_source" in dataframe.columns
                 else normalize_many(dataframe[source_col])
             )
-            from collections import Counter
 
             total_inputs = len(norm_values)
         else:
@@ -224,16 +221,6 @@ def mapping_step(dataframe: pd.DataFrame) -> pd.DataFrame:
                 per_source_df.loc[updates.index, col] = per_source_df.loc[
                     updates.index, col
                 ].where(per_source_df.loc[updates.index, col].notna(), updates[col])
-
-            # Compute potentials (number of input rows that would be uniquely
-            # mappable by a strict normalized-name match across the full input)
-            if mapper_name != "id_exact":
-                if "name" in frame.columns:
-                    norm_names = normalize_many(frame["name"])  # list[str]
-                    name_counts = Counter(norm_names)
-                    potential = sum(1 for v in norm_values if name_counts.get(v, 0) == 1)
-                else:
-                    potential = 0
 
             # Percentages relative to total input size
             new_cum_mapped = len(per_csv_cum[path_str])

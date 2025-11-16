@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 
 import pandas as pd
 
@@ -127,23 +127,6 @@ def unique_name_mapper(
     no_match_samples: List[str] = []
     ambiguous_samples: List[str] = []
     attempt_counter = 0
-
-    def _lookup_geodata_name(
-        frames: List[Tuple[Path, pd.DataFrame]],
-        match_path: Path,
-        match_id: str,
-    ) -> Optional[str]:
-        """Try to find the original geodata 'name' for logging purposes.
-
-        This is only called for every 100th attempt, so a linear scan is fine.
-        """
-        for p, f in frames:
-            if p == match_path and {"name", "id"}.issubset(f.columns):
-                # compare as strings for robustness
-                hits = f.loc[f["id"].astype(str) == str(match_id), "name"]
-                if not hits.empty:
-                    return str(hits.iloc[0])
-        return None
 
     # Prefer precomputed normalization if available
     norm_series = (

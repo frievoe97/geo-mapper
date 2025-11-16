@@ -23,7 +23,8 @@ def _detect_delimiter(path: Path, *, sample_size: int = 4096) -> str:
     if not sample.strip():
         raise ValueError(f"CSV file is empty or contains no detectable data: {path}")
     try:
-        dialect = csv.Sniffer().sniff(sample, delimiters=[",", ";", "\t", "|"])
+        candidate_delimiters = ",;\t|"
+        dialect = csv.Sniffer().sniff(sample, delimiters=candidate_delimiters)
         return dialect.delimiter
     except csv.Error:
         return ","

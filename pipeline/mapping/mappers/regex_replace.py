@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, cast
 
 import pandas as pd
 
@@ -54,12 +54,20 @@ def regex_replace_mapper(
 ) -> pd.DataFrame:
     if not geodata_frames:
         return pd.DataFrame(index=df_slice.index, columns=["mapped_by", "mapped_value", "mapped_source", "mapped_label", "mapped_param"]).assign(
-            mapped_by=pd.NA, mapped_value=pd.NA, mapped_source=pd.NA, mapped_label=pd.NA, mapped_param=pd.NA
+            mapped_by=cast(Any, pd.NA),
+            mapped_value=cast(Any, pd.NA),
+            mapped_source=cast(Any, pd.NA),
+            mapped_label=cast(Any, pd.NA),
+            mapped_param=cast(Any, pd.NA),
         )
     csv_path, frame = geodata_frames[0]
     if not {"name", "id"}.issubset(frame.columns):
         return pd.DataFrame(index=df_slice.index, columns=["mapped_by", "mapped_value", "mapped_source", "mapped_label", "mapped_param"]).assign(
-            mapped_by=pd.NA, mapped_value=pd.NA, mapped_source=pd.NA, mapped_label=pd.NA, mapped_param=pd.NA
+            mapped_by=cast(Any, pd.NA),
+            mapped_value=cast(Any, pd.NA),
+            mapped_source=cast(Any, pd.NA),
+            mapped_label=cast(Any, pd.NA),
+            mapped_param=cast(Any, pd.NA),
         )
 
     lookup = _build_norm_lookup(frame)

@@ -3,9 +3,9 @@ import logging
 import json
 import re
 import csv
-from pathlib import Path
 
 from pyproj import Transformer
+from pyproj.exceptions import ProjError
 
 from pipeline.constants import (
     GEODATA_RAW_ROOT,
@@ -100,8 +100,8 @@ def transform_coords(coords):
             return coords
         try:
             lon, lat = TRANSFORMER.transform(x, y)
-        except Exception:
-            # Keep original coordinates if reprojection fails for any reason
+        except ProjError:
+            # Keep original coordinates if reprojection fails (projection error)
             return coords
         rest = coords[2:] if len(coords) > 2 else []
         return [lon, lat] + [

@@ -168,7 +168,7 @@ def _write_unmapped_original(
 
 
 def _write_unmapped_geodata(
-    base_dir: Path, dataframe: pd.DataFrame, selected_sources: Set[str]
+    base_dir: Path, selected_sources: Set[str]
 ) -> Path:
     """Write CSV with geodata rows that were never used in mappings."""
     base_dir.mkdir(parents=True, exist_ok=True)
@@ -231,7 +231,6 @@ def _write_meta_json(base_dir: Path) -> Path | None:
 
     # Try to infer dataset type/level/year from the export path layout:
     # results/[INPUT_NAME]/[NUTS/LAU]/[level]/[year]/
-    parsed_dataset: str | None = None
     parsed_level: str | None = None
     parsed_year: str | None = None
     parts = base_dir.parts
@@ -243,10 +242,8 @@ def _write_meta_json(base_dir: Path) -> Path | None:
         parsed_year = version_dir
         raw_dataset = dataset_dir.upper()
         if raw_dataset == "LAU":
-            parsed_dataset = "LAU"
             parsed_level = "LAU"
         elif raw_dataset == "NUTS":
-            parsed_dataset = "NUTS"
             parsed_level = f"NUTS {level_dir}"
 
     # Columns
@@ -369,7 +366,7 @@ def export_results_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         id_col,
         name_col,
     )
-    unmapped_geodata_path = _write_unmapped_geodata(base_dir, dataframe, selected_sources)
+    unmapped_geodata_path = _write_unmapped_geodata(base_dir, selected_sources)
     _write_meta_json(base_dir)
 
     logger.info("Exported mapped pairs to: %s", mapped_path)
