@@ -12,7 +12,7 @@ from typing import Any
 import pandas as pd
 
 from pipeline import (
-    load_csv_step,
+    load_data_step,
     load_geodata_files_step,
     narrow_to_single_column_step,
     normalize_source_step,
@@ -29,7 +29,7 @@ from pipeline.storage import (
 )
 
 PIPELINE_STEPS = (
-    load_csv_step,
+    load_data_step,
     narrow_to_single_column_step,
     normalize_source_step,
     # Default to loading all candidate datasets
@@ -41,6 +41,11 @@ PIPELINE_STEPS = (
     manual_mapping_step,
     export_results_step,
 )
+
+
+def _parse_bool_flag(value: str) -> bool:
+    """Parse common truthy string representations into a boolean."""
+    return str(value).lower() in ("1", "true", "yes", "y")
 
 
 def parse_args() -> argparse.Namespace:
@@ -65,14 +70,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--auto-mappers",
         dest="auto_mappers",
-        type=lambda s: str(s).lower() in ("1", "true", "yes", "y"),
+        type=_parse_bool_flag,
         default=True,
         help="If true (default), skip interactive mapper selection and use default mappers.",
     )
     parser.add_argument(
         "--auto-export-source",
         dest="auto_export_source",
-        type=lambda s: str(s).lower() in ("1", "true", "yes", "y"),
+        type=_parse_bool_flag,
         default=False,
         help="If true, automatically use the first geodata source for export/manual mapping instead of asking.",
     )
@@ -99,6 +104,14 @@ def main() -> None:
         try:
             with args.json_file.open("r", encoding="utf-8") as f:
                 meta = json.load(f)
+        except (OSError, json.JSONDecodeError) as exc:
+            logging.warning(
+                "JSON metadata file %s could not be read: %s",
+                args.json_file,
+                exc,
+            )
+            set_meta_config(None)
+        else:
             if isinstance(meta, dict):
                 set_meta_config(meta)
             else:
@@ -107,13 +120,6 @@ def main() -> None:
                     args.json_file,
                 )
                 set_meta_config(None)
-        except Exception as exc:
-            logging.warning(
-                "JSON metadata file %s could not be read: %s",
-                args.json_file,
-                exc,
-            )
-            set_meta_config(None)
     else:
         set_meta_config(None)
 

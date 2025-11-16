@@ -64,7 +64,7 @@ def _collect_geodata_index(
     def _version_key(p: Path) -> int:
         try:
             return int(p.parent.name)
-        except Exception:
+        except (TypeError, ValueError):
             return -1
 
     unique_map_by_name: Dict[str, Tuple[str, Path]] = {}
@@ -166,19 +166,6 @@ def unique_name_mapper(
         else:
             count = name_counts.get(norm_val, 0)
             if count == 0:
-                # if attempt_counter % 100 == 0:
-                #     logger.info(
-                #         "attempt %d: source=%r | normalized=%r -> no-match",
-                #         attempt_counter,
-                #         original,
-                #         norm_val,
-                #     )
-                # logger.info(
-                #     "unique_name attempt idx=%s value=%r norm=%r -> no-match",
-                #     i,
-                #     val,
-                #     norm_val,
-                # )
                 if len(no_match_samples) < 5:
                     no_match_samples.append(str(original))
             else:
@@ -192,14 +179,6 @@ def unique_name_mapper(
                         count,
                         ids_count,
                     )
-                # logger.info(
-                #     "unique_name attempt idx=%s value=%r norm=%r -> ambiguous matches=%d ids=%d",
-                #     i,
-                #     val,
-                #     norm_val,
-                #     count,
-                #     ids_count,
-                # )
                 if len(ambiguous_samples) < 5:
                     ambiguous_samples.append(
                         f"{original} (matches={count}, ids={ids_count})"

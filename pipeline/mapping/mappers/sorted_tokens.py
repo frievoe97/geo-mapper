@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 
 import pandas as pd
 
@@ -59,7 +59,7 @@ def _collect_geodata_index(
     def _version_key(p: Path) -> int:
         try:
             return int(p.parent.name)
-        except Exception:
+        except (TypeError, ValueError):
             return -1
 
     unique_map_by_key: Dict[str, Tuple[str, Path]] = {}

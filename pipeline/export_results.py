@@ -291,11 +291,12 @@ def _write_meta_json(base_dir: Path) -> Path | None:
         out_path = base_dir / "meta.json"
         with out_path.open("w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=2)
-        logger.info("Wrote meta-information to %s.", out_path)
-        return out_path
-    except Exception as exc:
+    except OSError as exc:
         logger.warning("Could not write meta.json: %s", exc)
         return None
+
+    logger.info("Wrote meta-information to %s.", out_path)
+    return out_path
 
 
 def export_results_step(dataframe: pd.DataFrame) -> pd.DataFrame:
@@ -330,10 +331,13 @@ def export_results_step(dataframe: pd.DataFrame) -> pd.DataFrame:
 
     # Target path: results/[INPUT_NAME]/[NUTS/LAU]/[level]/[year]/
     # Try to derive dataset type/level/year from the selected geodata CSV path.
+    src_path = Path(selected_source)
     try:
-        src_path = Path(selected_source)
         version_dir = src_path.parent.name  # e.g. "2013"
         dataset_dir_raw = src_path.parent.parent.name  # e.g. "nuts", "lau", "NUTS_0", "LAU"
+    except AttributeError:
+        base_dir = RESULTS_ROOT / input_name / geodata_name
+    else:
         raw_upper = dataset_dir_raw.upper()
         # New layout: NUTS_<level>/[year]/file or LAU/[year]/file
         m = re.match(r"(NUTS)_(\d+)$", raw_upper)
@@ -349,9 +353,6 @@ def export_results_step(dataframe: pd.DataFrame) -> pd.DataFrame:
                 # Fallback: treat dataset name as the level
                 level_dir = dataset_dir
         base_dir = RESULTS_ROOT / input_name / dataset_dir / level_dir / version_dir
-    except Exception:
-        # Fallback: keep using the previously composed geodata_name
-        base_dir = RESULTS_ROOT / input_name / geodata_name
 
     mapped_path = _write_mapped_pairs(
         base_dir,

@@ -10,6 +10,7 @@ This module contains:
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Final, Iterable
 
@@ -75,7 +76,6 @@ MAPPER_PRIORITY: Final[dict[str, int]] = _build_priority_mapping(DEFAULT_MAPPERS
 
 # Rules for the regex_replace mapper: list of (pattern, replacement)
 REGEX_REPLACEMENTS: Final[list[tuple[str, str]]] = [
-    # Handle special title phrases first (e.g. "Landeshauptstadt", "Hansestadt")
     (r"\bHanse- und Universitätsstadt\b", "Kreisfreie Stadt"),
     (r"\bLandeshauptstadt\b", "Kreisfreie Stadt"),
     (r"\bLandeshauptstadt\b", "Stadtkreis"),
@@ -85,7 +85,6 @@ REGEX_REPLACEMENTS: Final[list[tuple[str, str]]] = [
     (r"\bWissenschaftsstadt\b", "Kreisfreie Stadt"),
     (r"\bStadt der FernUniversität\b", "Kreisfreie Stadt"),
     (r"\bFreie und Hansestadt\b", ""),
-    # More general replacements for titles and abbreviations
     (r"\bStadt\b", "Kreisfreie Stadt"),
     (r"\bWissenschaftsstadt\b", ""),
     (r"\bStadt\b", "Stadtkreis"),
@@ -94,12 +93,22 @@ REGEX_REPLACEMENTS: Final[list[tuple[str, str]]] = [
     (r"\bBL\b", ""),
     (r"\bDE\b", ""),
     (r"\bKreis\b", ""),
-    (r"\bin der\b", "i. d."),
-    (r"\bi\. d\.\b", "in der"),
-    (r"\ban der\b", "a. d."),
-    (r"\ba\. d\.\b", "an der"),
-    (r"\bam\b", "a."),
-    (r"\ba\.\b", "am"),
+    (r"\bOberpfalz\b", "Opf "),
+    (r"\bin der\b", "i. d. "),
+    (r"\bi\. d\.\b", "in der "),
+    (r"\ban der\b", "a. d. "),
+    (r"\ba\. d\.\b", "an der "),
+    (r"\bam\b", "a. "),
+    (r"\ba\.\b", "am "),
+    (r"\bim\b", "i. "),
+    (r"\bi\.\b", "im "),
+    (r"\bLandkreis\b", "(D)"),
+    (r"\bEifelkreis\b", ""),
+    (r",\s*Stadt,\s+kreisfreie Stadt\b", ", Kreisfreie Stadt"),
+    (r",\s*kreisfreie Stadt,\s+Hansestadt\b", ", Kreisfreie Stadt"),
+    (r",\s*kreisfreie Stadt,\s+Landeshauptstadt\b", ", Kreisfreie Stadt"),
+    (r",\s*kreisfreie Stadt,\s+documenta-Stadt\b", ", Kreisfreie Stadt"),
+    (r",\s*Hansestadt,\s+kreisfreie Stadt\b", ", Kreisfreie Stadt"),
 ]
 
 # Title words used to build variants in the suffix_variants mapper
@@ -111,6 +120,38 @@ SUFFIX_TITLE_WORDS: Final[list[str]] = [
     "Eifelkreis",
     "Stadt",
 ]
+
+
+# ------------------------------------------------------------------------------
+# Fuzzy mapper thresholds and bonuses
+# ------------------------------------------------------------------------------
+
+FUZZY_MIN_BASE: Final[float] = 55.0
+FUZZY_MIN_TOTAL: Final[float] = 64.0
+FUZZY_MARGIN_MIN: Final[float] = 8.0
+FUZZY_MARGIN_KFS_LK_NOHINT: Final[float] = 12.0
+FUZZY_TYPE_BONUS: Final[float] = 10.0
+FUZZY_STRUCT_BONUS: Final[float] = 6.0
+
+
+# Regex patterns used by the fuzzy_confident mapper
+CSV_DECOR_RE = re.compile(
+    r"\b(kreisfreie\s+stadt|stadtkreis|landkreis|kreis)\b",
+    re.IGNORECASE,
+)
+EXCEL_DECOR_RE = re.compile(
+    r"\b(landeshauptstadt|documenta[-\s]?stadt|wissenschaftsstadt|klingenstadt|"
+    r"freie\s+und\s+hansestadt|stadt(?:\s+der\s+fernuniversität)?)\b",
+    re.IGNORECASE,
+)
+KFS_RE = re.compile(
+    r"\b(kreisfreie\s+stadt|stadtkreis)\b",
+    re.IGNORECASE,
+)
+LANDKREIS_RE = re.compile(
+    r"\b(landkreis|kreis)\b",
+    re.IGNORECASE,
+)
 
 
 # ------------------------------------------------------------------------------
@@ -163,4 +204,3 @@ LABEL_MANUAL_NO_MAPPING: Final[str] = "No mapping / back"
 CURSES_MANUAL_HELP: Final[
     str
 ] = "TAB/←→: switch pane, ↑/↓: move, ENTER: map, u: undo, q: finish"
-

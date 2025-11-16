@@ -46,8 +46,8 @@ def _load_excel(path: Path) -> pd.DataFrame:
         engine = "xlrd"
     try:
         xls = pd.ExcelFile(path, engine=engine)
-    except Exception as exc:
-        raise ValueError(f"Could not open Excel file {path}: {exc}")
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"Could not open Excel file {path}: {exc}") from exc
     sheets = list(xls.sheet_names)
     if not sheets:
         raise ValueError(f"Excel file has no sheets: {path}")
@@ -62,8 +62,8 @@ def _load_excel(path: Path) -> pd.DataFrame:
     logger.info("Loading Excel %s sheet=%s", str(path), chosen)
     try:
         return pd.read_excel(path, sheet_name=chosen, engine=engine)
-    except Exception as exc:
-        raise ValueError(f"Failed reading sheet '{chosen}' from {path}: {exc}")
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"Failed reading sheet '{chosen}' from {path}: {exc}") from exc
 
 
 def _drop_completely_empty_rows(df: pd.DataFrame) -> pd.DataFrame:
@@ -88,7 +88,7 @@ def _drop_completely_empty_rows(df: pd.DataFrame) -> pd.DataFrame:
     return cleaned
 
 
-def load_csv_step(path: Path) -> pd.DataFrame:
+def load_data_step(path: Path) -> pd.DataFrame:
     """Load CSV or Excel into a DataFrame as the first pipeline step."""
     if not path.is_file():
         raise FileNotFoundError(f"File not found: {path}")
@@ -105,3 +105,8 @@ def load_csv_step(path: Path) -> pd.DataFrame:
     # Remove rows that are completely empty after load
     df = _drop_completely_empty_rows(df)
     return df
+
+
+def load_csv_step(path: Path) -> pd.DataFrame:
+    """Backward-compatible alias for load_data_step."""
+    return load_data_step(path)

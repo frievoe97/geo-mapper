@@ -37,10 +37,12 @@ def _build_column_choices(dataframe: pd.DataFrame) -> list[questionary.Choice]:
     choices: list[questionary.Choice] = []
     for col in dataframe.columns:
         sample = _first_non_empty_value(dataframe[col])
-        if sample is not None:
-            title = f"{col} (example: {sample})"
-        else:
-            title = str(col)
+        # If the column has no non-empty cells, fall back to using the
+        # column header itself as the "example" value so that *always*
+        # some representative value is shown.
+        if sample is None:
+            sample = str(col)
+        title = f"{col} (example: {sample})"
         choices.append(questionary.Choice(title=title, value=col))
     return choices
 
@@ -54,10 +56,7 @@ def _choose_columns(
     may be multiple, but cannot re-use the chosen ID/name columns.
     """
     if dataframe.columns.empty:
-        raise ValueError("The CSV contains no columns.")
-    columns = list(dataframe.columns)
-    if not columns:
-        raise ValueError("The CSV contains no columns.")
+        raise ValueError("The input data contains no columns.")
 
     column_choices = _build_column_choices(dataframe)
 
@@ -174,4 +173,13 @@ def narrow_to_single_column_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         if col is not None and col not in selected_cols:
             selected_cols.append(col)
 
-    return dataframe[selected_cols].copy()
+    # Work on a copy of the selected columns and strip leading/trailing
+    # whitespace from string values in all selected columns.
+    result = dataframe[selected_cols].copy()
+    for col in selected_cols:
+        if result[col].dtype == "object":
+            result[col] = result[col].map(
+                lambda v: v.strip() if isinstance(v, str) else v
+            )
+
+    return result

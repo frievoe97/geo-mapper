@@ -61,7 +61,13 @@ def _choose_single_geodata_source(usage: List[Tuple[str, int, float, int, float,
 
     try:
         from questionary import Choice
-
+    except ImportError:
+        # Fallback without Choice helper: simple labels only
+        selected = questionary.select(
+            PROMPT_SELECT_EXPORT_SOURCE,
+            choices=[source for source, _hits, _pct, _gh, _pg, _tg in usage],
+        ).ask()
+    else:
         choices = []
         for source, hits, pct_input, geodata_hits, pct_geodata, geodata_total in usage:
             title = (
@@ -74,12 +80,6 @@ def _choose_single_geodata_source(usage: List[Tuple[str, int, float, int, float,
         selected = questionary.select(
             PROMPT_SELECT_EXPORT_SOURCE,
             choices=choices,
-        ).ask()
-    except Exception:
-        # Fallback without Choice helper: simple labels only
-        selected = questionary.select(
-            PROMPT_SELECT_EXPORT_SOURCE,
-            choices=[source for source, _hits, _pct in usage],
         ).ask()
 
     return selected or None

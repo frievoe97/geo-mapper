@@ -87,19 +87,26 @@ def _is_number_like(x):
     try:
         float(x)
         return True
-    except Exception:
+    except (TypeError, ValueError):
         return False
 
 
 def transform_coords(coords):
     if isinstance(coords, (list, tuple)) and _is_number_like(coords[0]) and _is_number_like(coords[1]):
         try:
-            x = float(coords[0]); y = float(coords[1])
-            lon, lat = TRANSFORMER.transform(x, y)
-            rest = coords[2:] if len(coords) > 2 else []
-            return [lon, lat] + [transform_coords(r) if isinstance(r, (list, tuple)) else r for r in rest]
-        except Exception:
+            x = float(coords[0])
+            y = float(coords[1])
+        except (TypeError, ValueError):
             return coords
+        try:
+            lon, lat = TRANSFORMER.transform(x, y)
+        except Exception:
+            # Keep original coordinates if reprojection fails for any reason
+            return coords
+        rest = coords[2:] if len(coords) > 2 else []
+        return [lon, lat] + [
+            transform_coords(r) if isinstance(r, (list, tuple)) else r for r in rest
+        ]
     if isinstance(coords, (list, tuple)):
         return [transform_coords(c) for c in coords]
     return coords
@@ -115,10 +122,7 @@ def reproject(geom):
     coords = geom.get("coordinates")
     if coords is None:
         return geom
-    try:
-        return {"type": t, "coordinates": transform_coords(coords)}
-    except Exception:
-        return geom
+    return {"type": t, "coordinates": transform_coords(coords)}
 
 
 def process_lau(path):
@@ -166,7 +170,7 @@ def process_nuts(path):
         lvl = props.get("LEVL_CODE")
         try:
             li = int(str(lvl))
-        except Exception:
+        except (TypeError, ValueError):
             continue
         if li not in buckets:
             continue

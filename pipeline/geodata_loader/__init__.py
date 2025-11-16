@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import logging
-from typing import List, Optional
+from typing import Optional
 
 import pandas as pd
 

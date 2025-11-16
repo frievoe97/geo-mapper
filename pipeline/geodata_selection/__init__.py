@@ -131,7 +131,20 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
     # Interactive selection of the level – with human-readable German descriptions
     try:
         from questionary import Choice
-
+    except ImportError:
+        # Fallback without Choice helper: use descriptive labels and map back to internal values
+        level_titles = LEVEL_TITLES
+        level_values_fallback: List[str] = list(LEVEL_VALUES)
+        # Build display labels including the German description
+        level_labels = [level_titles[v] for v in level_values_fallback]
+        level_choices_fb = _with_unknown(level_labels)
+        default_label = level_titles.get("NUTS 3", "NUTS 3")
+        level_choice = _prompt_select(
+            PROMPT_SELECT_GEODATA_LEVEL,
+            level_choices_fb,
+            default_label,
+        )
+    else:
         level_titles = LEVEL_TITLES
         level_values: List[str] = list(LEVEL_VALUES)
         level_choices = [Choice(title=UNKNOWN_OPTION, value=UNKNOWN_OPTION)]
@@ -145,19 +158,6 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
             choices=level_choices,
             default=default_value,
         ).ask()
-    except Exception:
-        # Fallback without Choice helper: use descriptive labels and map back to internal values
-        level_titles = LEVEL_TITLES
-        level_values_fallback: List[str] = list(LEVEL_VALUES)
-        # Build display labels including the German description
-        level_labels = [level_titles[v] for v in level_values_fallback]
-        level_choices_fb = _with_unknown(level_labels)
-        default_label = level_titles.get("NUTS 3", "NUTS 3")
-        level_choice = _prompt_select(
-            PROMPT_SELECT_GEODATA_LEVEL,
-            level_choices_fb,
-            default_label,
-        )
 
     # Map UI labels back to internal level values if needed
     label_to_value = {

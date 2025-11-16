@@ -25,7 +25,7 @@ def normalize_string(value: object) -> str:
     try:
         if pd.isna(value):
             return ""
-    except Exception:
+    except TypeError:
         # Fallback for types without isna semantics
         if isinstance(value, float) and math.isnan(value):
             return ""
@@ -66,7 +66,7 @@ def normalize_id(value: object) -> str:
     try:
         if pd.isna(value):
             return ""
-    except Exception:
+    except TypeError:
         if isinstance(value, float) and math.isnan(value):
             return ""
     text = str(value).strip().upper()

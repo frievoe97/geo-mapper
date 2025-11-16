@@ -6,8 +6,6 @@ similarity and simple type/decorator handling. It works per single CSV.
 
 from __future__ import annotations
 
-import re
-from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
 import logging
@@ -16,19 +14,21 @@ import difflib
 import pandas as pd
 
 from ...utils.text import normalize_string
+from ...constants import (
+    CSV_DECOR_RE,
+    EXCEL_DECOR_RE,
+    KFS_RE,
+    LANDKREIS_RE,
+    FUZZY_MIN_BASE,
+    FUZZY_MIN_TOTAL,
+    FUZZY_MARGIN_MIN,
+    FUZZY_MARGIN_KFS_LK_NOHINT,
+    FUZZY_TYPE_BONUS,
+    FUZZY_STRUCT_BONUS,
+)
 
 
 logger = logging.getLogger(__name__)
-
-
-CSV_DECOR_RE = re.compile(r"\b(kreisfreie\s+stadt|stadtkreis|landkreis|kreis)\b", re.IGNORECASE)
-EXCEL_DECOR_RE = re.compile(
-    r"\b(landeshauptstadt|documenta[-\s]?stadt|wissenschaftsstadt|klingenstadt|"
-    r"freie\s+und\s+hansestadt|stadt(?:\s+der\s+fernuniversität)?)\b",
-    re.IGNORECASE,
-)
-KFS_RE = re.compile(r"\b(kreisfreie\s+stadt|stadtkreis)\b", re.IGNORECASE)
-LANDKREIS_RE = re.compile(r"\b(landkreis|kreis)\b", re.IGNORECASE)
 
 
 def _type_pref(name_raw: str) -> str | None:
@@ -70,22 +70,26 @@ def _score_pair(x_raw: str, x_norm: str, y_raw: str, y_norm: str) -> float:
 def fuzzy_confident_mapper(
     df_slice: pd.DataFrame, geodata_frames: List[Tuple[Path, pd.DataFrame]], source_col: str
 ) -> pd.DataFrame:
-    # thresholds & bonuses (tuned conservatively)
-    MIN_BASE = 55.0
-    MIN_TOTAL = 64.0
-    MARGIN_MIN = 8.0
-    MARGIN_KFS_LK_NOHINT = 12.0
-    TYPE_BONUS = 10.0
-    STRUCT_BONUS = 6.0
-
     if not geodata_frames:
-        return pd.DataFrame(index=df_slice.index, columns=["mapped_by", "mapped_value", "mapped_source", "mapped_label"]).assign(
-            mapped_by=pd.NA, mapped_value=pd.NA, mapped_source=pd.NA, mapped_label=pd.NA
+        # No geodata available: return an empty-shaped result DataFrame.
+        return pd.DataFrame(
+            {
+                "mapped_by": pd.Series(dtype="object", index=df_slice.index),
+                "mapped_value": pd.Series(dtype="object", index=df_slice.index),
+                "mapped_source": pd.Series(dtype="object", index=df_slice.index),
+                "mapped_label": pd.Series(dtype="object", index=df_slice.index),
+            }
         )
     csv_path, frame = geodata_frames[0]
     if not {"name", "id"}.issubset(frame.columns):
-        return pd.DataFrame(index=df_slice.index, columns=["mapped_by", "mapped_value", "mapped_source", "mapped_label"]).assign(
-            mapped_by=pd.NA, mapped_value=pd.NA, mapped_source=pd.NA, mapped_label=pd.NA
+        # Geodata has no usable columns: return an empty-shaped result DataFrame.
+        return pd.DataFrame(
+            {
+                "mapped_by": pd.Series(dtype="object", index=df_slice.index),
+                "mapped_value": pd.Series(dtype="object", index=df_slice.index),
+                "mapped_source": pd.Series(dtype="object", index=df_slice.index),
+                "mapped_label": pd.Series(dtype="object", index=df_slice.index),
+            }
         )
 
     # Prepare candidates view
@@ -122,11 +126,12 @@ def fuzzy_confident_mapper(
 
         scored: List[Tuple[float, float, str, str, str | None]] = []
         for _, r in sub.iterrows():
-            y_raw, y_norm = r["_raw"], r["_norm"]
+            y_raw = str(r["_raw"])
+            y_norm = str(r["_norm"])
             base_score = _score_pair(x_raw, x_norm, y_raw, y_norm)
             y_type = _cand_type(y_raw)
-            type_bonus = TYPE_BONUS if (x_pref and y_type == x_pref) else 0.0
-            struct_bonus = STRUCT_BONUS if (r["_base"] == x_base) else 0.0
+            type_bonus = FUZZY_TYPE_BONUS if (x_pref and y_type == x_pref) else 0.0
+            struct_bonus = FUZZY_STRUCT_BONUS if (r["_base"] == x_base) else 0.0
             total = base_score + type_bonus + struct_bonus
             scored.append((total, base_score, str(r["id"]), str(r["name"]), y_type))
 
@@ -141,7 +146,7 @@ def fuzzy_confident_mapper(
         scored.sort(key=lambda t: t[0], reverse=True)
         top_total, top_base, top_id, top_name, top_type = scored[0]
         if len(scored) == 1:
-            if (top_base >= MIN_BASE) and (top_total >= MIN_TOTAL):
+            if (top_base >= FUZZY_MIN_BASE) and (top_total >= FUZZY_MIN_TOTAL):
                 out_rows["mapped_by"].append("fuzzy_confident")
                 out_rows["mapped_value"].append(top_id)
                 out_rows["mapped_source"].append(str(csv_path))
@@ -159,7 +164,10 @@ def fuzzy_confident_mapper(
         margin = top_total - second_total
         top_types = {t for *_rest, t in scored[: min(4, len(scored))]}
         mixed_types_no_hint = (x_pref is None) and ("kfs" in top_types) and ("lk" in top_types)
-        margin_needed = max(MARGIN_MIN, MARGIN_KFS_LK_NOHINT if mixed_types_no_hint else MARGIN_MIN)
+        margin_needed = max(
+            FUZZY_MARGIN_MIN,
+            FUZZY_MARGIN_KFS_LK_NOHINT if mixed_types_no_hint else FUZZY_MARGIN_MIN,
+        )
 
         # hard guard: if explicit x_pref conflicts with top_type, skip
         if (x_pref is not None) and (top_type is not None) and (x_pref != top_type):
@@ -170,7 +178,7 @@ def fuzzy_confident_mapper(
             out_rows["mapped_param"].append(pd.NA)
             continue
 
-        if (top_base >= MIN_BASE) and (top_total >= MIN_TOTAL) and (margin >= margin_needed):
+        if (top_base >= FUZZY_MIN_BASE) and (top_total >= FUZZY_MIN_TOTAL) and (margin >= margin_needed):
             out_rows["mapped_by"].append("fuzzy_confident")
             out_rows["mapped_value"].append(top_id)
             out_rows["mapped_source"].append(str(csv_path))

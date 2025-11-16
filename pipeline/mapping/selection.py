@@ -46,7 +46,13 @@ def select_mappers_step(dataframe: pd.DataFrame) -> pd.DataFrame:
 
     try:
         from questionary import Choice
-
+    except ImportError:
+        # Fallback if Choice is not available
+        selected = questionary.checkbox(
+            PROMPT_SELECT_MAPPERS,
+            choices=list(DEFAULT_MAPPERS),
+        ).ask()
+    else:
         choices = [
             Choice("id_exact", checked=has_id),
             Choice("unique_name", checked=has_name),
@@ -58,12 +64,6 @@ def select_mappers_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         selected = questionary.checkbox(
             PROMPT_SELECT_MAPPERS,
             choices=choices,
-        ).ask()
-    except Exception:
-        # Fallback if Choice is not available
-        selected = questionary.checkbox(
-            PROMPT_SELECT_MAPPERS,
-            choices=list(DEFAULT_MAPPERS),
         ).ask()
 
     if not selected:

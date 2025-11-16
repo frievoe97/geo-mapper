@@ -44,7 +44,7 @@ def _manual_mapping_curses_loop(
     source_path: str,
     source_col: str,
 ) -> pd.DataFrame:
-    """Curses-based UI with two panes: input CSV on the left, geodata on the right.
+    """Curses-based UI with two panes: input data on the left, geodata on the right.
 
     This view is used to manually connect remaining unmapped input rows to
     geodata rows. It keeps already-used geodata IDs unique within a CSV.
@@ -59,7 +59,7 @@ def _manual_mapping_curses_loop(
     geo_search = ""
 
     def _build_lists() -> Tuple[List[Tuple[object, str]], List[Tuple[str, str]]]:
-        """Build filtered lists for CSV inputs and available geodata rows."""
+        """Build filtered lists for input rows and available geodata rows."""
         # Unmapped input rows
         unmapped_mask = mapping_df["mapped_value"].isna()
         input_items: List[Tuple[object, str]] = []
@@ -105,13 +105,13 @@ def _manual_mapping_curses_loop(
         mid = width // 2
         max_rows = max(1, height - 4)
 
-        # Header line describing which geodata CSV we are mapping against
+        # Header line describing which geodata source we are mapping against
         header = f"Manual mapping for: {source_path}"
         stdscr.addnstr(0, 0, header, width - 1)
         stdscr.addnstr(1, 0, message, width - 1)
 
         # Panel titles (labels; focus is highlighted on individual rows)
-        left_title = " CSV inputs (unmapped) "
+        left_title = " Input data (unmapped) "
         right_title = " Geodata (still unused) "
         stdscr.addnstr(3, 0, left_title, max(0, mid - 1))
         stdscr.addnstr(3, mid + 1, right_title, max(0, width - mid - 2))
@@ -119,12 +119,12 @@ def _manual_mapping_curses_loop(
         # Vertical separator line between the panes
         try:
             stdscr.vline(0, mid, curses.ACS_VLINE, height)
-        except Exception:
+        except curses.error:
             # Fallback if ACS_VLINE is not available
             for y in range(0, height):
                 stdscr.addch(y, mid, "|")
 
-        # Left pane: CSV inputs
+        # Left pane: input values
         for row in range(max_rows):
             idx_in_list = left_offset + row
             if idx_in_list >= len(input_items):
@@ -197,9 +197,11 @@ def _manual_mapping_curses_loop(
             stdscr.addnstr(height - 1, 0, prompt, width - 1)
             curses.echo()
             try:
-                query_bytes = stdscr.getstr(height - 1, len(prompt), max(1, width - len(prompt) - 1))
+                query_bytes = stdscr.getstr(
+                    height - 1, len(prompt), max(1, width - len(prompt) - 1)
+                )
                 query = query_bytes.decode("utf-8", errors="ignore")
-            except Exception:
+            except (curses.error, ValueError):
                 query = ""
             finally:
                 curses.noecho()
@@ -431,80 +433,6 @@ def _find_geodata_frame(source_path: str) -> Tuple[Path, pd.DataFrame] | None:
     return None
 
 
-def _select_unmapped_row(mapping_df: pd.DataFrame, dataframe: pd.DataFrame, source_col: str) -> object | None:
-    """Let the user pick one unmapped input row (by index) to map."""
-    unmapped_mask = mapping_df["mapped_value"].isna()
-    unmapped_indices = list(mapping_df.index[unmapped_mask])
-    if not unmapped_indices:
-        return None
-
-    # Build a concise selection list (max 30 items)
-    from questionary import Choice
-
-    choices: List[Choice] = []
-    for idx in unmapped_indices[:30]:
-        val = dataframe.loc[idx, source_col]
-        choices.append(Choice(f"[{idx}] {val}", value=idx))
-    choices.append(Choice(LABEL_MANUAL_DONE, value=_DONE_SENTINEL))
-
-    selected = questionary.select(
-        PROMPT_MANUAL_SELECT_INPUT,
-        choices=choices,
-    ).ask()
-    return selected
-
-
-def _select_geodata_target(
-    geodata_frame: pd.DataFrame, mapping_df: pd.DataFrame
-) -> Tuple[str, str] | Tuple[None, None]:
-    """Let the user select a geodata row (id, name) as mapping target.
-
-    Only geodata entries whose ID has not yet been used in this CSV
-    (neither automatically nor manually) are offered.
-    """
-    if geodata_frame.empty or not {"id", "name"}.issubset(geodata_frame.columns):
-        return None, None
-
-    # Filter out IDs that have already been mapped
-    used_ids = set(str(v) for v in mapping_df["mapped_value"].dropna().astype(str))
-    if used_ids:
-        base_candidates = geodata_frame[~geodata_frame["id"].astype(str).isin(used_ids)]
-    else:
-        base_candidates = geodata_frame
-    if base_candidates.empty:
-        logger.info("All geodata entries in this CSV are already mapped.")
-        return None, None
-
-    # Optional search term to narrow down candidates
-    search = questionary.text(PROMPT_MANUAL_SEARCH_GEODATA).ask()
-
-    candidates = base_candidates
-    if search:
-        mask = base_candidates["name"].astype(str).str.contains(search, case=False, na=False)
-        candidates = base_candidates[mask]
-    if candidates.empty:
-        logger.info("No geodata candidates found for the search term.")
-        return None, None
-
-    # Show at most 30 candidates in the menu
-    from questionary import Choice
-
-    choices: List[Choice] = []
-    for _, row in candidates.head(30).iterrows():
-        gid = str(row["id"])
-        name = str(row["name"])
-        choices.append(Choice(f"{gid} – {name}", value=(gid, name)))
-    choices.append(Choice(LABEL_MANUAL_NO_MAPPING, value=(None, None)))
-
-    selected = questionary.select(
-        PROMPT_MANUAL_SELECT_GEODATA, choices=choices
-    ).ask()
-
-    if not selected:
-        return None, None
-    return selected
-
-
 def manual_mapping_step(dataframe: pd.DataFrame) -> pd.DataFrame:
     """Pipeline step: allow manual mappings for the selected geodata CSV."""
     source_path = get_export_geodata_source()
@@ -553,7 +481,7 @@ def manual_mapping_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         mapping_df = _run_curses_manual_mapping(
             dataframe, mapping_df, geodata_frame, source_path, source_col
         )
-    except Exception as exc:
+    except curses.error as exc:
         logger.info(
             "Curses UI for manual mapping is not available (%s) – falling back to a dialog-based variant.",
             exc,
