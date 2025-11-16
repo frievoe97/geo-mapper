@@ -1,0 +1,42 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.*
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Logs
+*.log
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# IDE / editor settings
+.vscode/
+.idea/
+*.code-workspace
+
+# macOS
+.DS_Store
+
+# Large / generated data
+geodata_raw/
+geodata_clean/
+results/
+
+# Temporary files (e.g. Excel lock files)
+~$*
