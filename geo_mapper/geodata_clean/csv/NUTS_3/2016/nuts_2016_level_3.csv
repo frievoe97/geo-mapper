@@ -1,0 +1,402 @@
+id_nuts,name,id_ars
+DE600,Hamburg,02000
+DE711,"Darmstadt, Kreisfreie Stadt",06411
+DE712,"Frankfurt am Main, Kreisfreie Stadt",06412
+DE713,"Offenbach am Main, Kreisfreie Stadt",06413
+DE714,"Wiesbaden, Kreisfreie Stadt",06414
+DE715,Bergstraße,06431
+DE737,Werra-Meißner-Kreis,06636
+DE803,"Rostock, Kreisfreie Stadt",13003
+DE804,"Schwerin, Kreisfreie Stadt",13004
+DE80L,Vorpommern-Rügen,13073
+DE923,Hameln-Pyrmont,03252
+DE94E,"Osnabrück, Landkreis",03459
+DE94F,Vechta,03460
+DE94G,Wesermarsch,03461
+DEA59,Olpe,05966
+DEA5A,Siegen-Wittgenstein,05970
+DEA5B,Soest,05974
+DEA5C,Unna,05978
+DEB11,"Koblenz, Kreisfreie Stadt",07111
+DE925,Hildesheim,03254
+DE926,Holzminden,03255
+DE927,Nienburg (Weser),03256
+DE928,Schaumburg,03257
+DE929,Region Hannover,03241
+DE931,Celle,03351
+DE932,Cuxhaven,03352
+DE80J,Mecklenburgische Seenplatte,13071
+DE933,Harburg,03353
+DE934,Lüchow-Dannenberg,03354
+DE935,"Lüneburg, Landkreis",03355
+DE936,Osterholz,03356
+DE937,Rotenburg (Wümme),03357
+DE938,Heidekreis,03358
+DE939,Stade,03359
+DE93A,Uelzen,03360
+DE93B,Verden,03361
+DE941,"Delmenhorst, Kreisfreie Stadt",03401
+DE942,"Emden, Kreisfreie Stadt",03402
+DE943,"Oldenburg (Oldenburg), Kreisfreie Stadt",03403
+DE80K,Landkreis Rostock,13072
+DE944,"Osnabrück, Kreisfreie Stadt",03404
+DE945,"Wilhelmshaven, Kreisfreie Stadt",03405
+DE946,Ammerland,03451
+DE947,Aurich,03452
+DE948,Cloppenburg,03453
+DE949,Emsland,03454
+DE94A,Friesland (DE),03455
+DE94B,Grafschaft Bentheim,03456
+DE94C,Leer,03457
+DE94D,"Oldenburg, Landkreis",03458
+DE406,Dahme-Spreewald,12061
+DE407,Elbe-Elster,12062
+DE911,"Braunschweig, Kreisfreie Stadt",03101
+DE913,"Wolfsburg, Kreisfreie Stadt",03103
+DE912,"Salzgitter, Kreisfreie Stadt",03102
+DE246,"Bayreuth, Landkreis",09472
+DE247,"Coburg, Landkreis",09473
+DE248,Forchheim,09474
+DE265,Bad Kissingen,09672
+DE266,Rhön-Grabfeld,09673
+DE267,Haßberge,09674
+DE111,"Stuttgart, Stadtkreis",08111
+DE12C,Freudenstadt,08237
+DE131,"Freiburg im Breisgau, Stadtkreis",08311
+DE132,Breisgau-Hochschwarzwald,08315
+DE147,Bodenseekreis,08435
+DE148,Ravensburg,08436
+DE149,Sigmaringen,08437
+DE211,"Ingolstadt, Kreisfreie Stadt",09161
+DE21K,"Rosenheim, Landkreis",09187
+DE21L,Starnberg,09188
+DE21M,Traunstein,09189
+DE235,Cham,09372
+DE236,Neumarkt i. d. OPf.,09373
+DE237,Neustadt a. d. Waldnaab,09374
+DE249,"Hof, Landkreis",09475
+DE24A,Kronach,09476
+DE24B,Kulmbach,09477
+DE24C,Lichtenfels,09478
+DE25C,Weißenburg-Gunzenhausen,09577
+DE261,"Aschaffenburg, Kreisfreie Stadt",09661
+DE262,"Schweinfurt, Kreisfreie Stadt",09662
+DE263,"Würzburg, Kreisfreie Stadt",09663
+DE264,"Aschaffenburg, Landkreis",09671
+DE212,"München, Kreisfreie Stadt",09162
+DE213,"Rosenheim, Kreisfreie Stadt",09163
+DE133,Emmendingen,08316
+DE134,Ortenaukreis,08317
+DE135,Rottweil,08325
+DE136,Schwarzwald-Baar-Kreis,08326
+DE214,Altötting,09171
+DE215,Berchtesgadener Land,09172
+DE216,Bad Tölz-Wolfratshausen,09173
+DE217,Dachau,09174
+DE21N,Weilheim-Schongau,09190
+DE221,"Landshut, Kreisfreie Stadt",09261
+DE222,"Passau, Kreisfreie Stadt",09262
+DE223,"Straubing, Kreisfreie Stadt",09263
+DE224,Deggendorf,09271
+DE225,Freyung-Grafenau,09272
+DE238,"Regensburg, Landkreis",09375
+DE239,Schwandorf,09376
+DE268,Kitzingen,09675
+DE24D,Wunsiedel i. Fichtelgebirge,09479
+DE251,"Ansbach, Kreisfreie Stadt",09561
+DE252,"Erlangen, Kreisfreie Stadt",09562
+DE253,"Fürth, Kreisfreie Stadt",09563
+DE254,"Nürnberg, Kreisfreie Stadt",09564
+DE255,"Schwabach, Kreisfreie Stadt",09565
+DE137,Tuttlingen,08327
+DE269,Miltenberg,09676
+DE26A,Main-Spessart,09677
+DE218,Ebersberg,09175
+DE138,Konstanz,08335
+DE139,Lörrach,08336
+DE226,Kelheim,09273
+DE219,Eichstätt,09176
+DE21A,Erding,09177
+DE21B,Freising,09178
+DE227,"Landshut, Landkreis",09274
+DE228,"Passau, Landkreis",09275
+DE256,"Ansbach, Landkreis",09571
+DE257,Erlangen-Höchstadt,09572
+DE258,"Fürth, Landkreis",09573
+DE13A,Waldshut,08337
+DE141,Reutlingen,08415
+DE142,"Tübingen, Landkreis",08416
+DE143,Zollernalbkreis,08417
+DE229,Regen,09276
+DE22A,Rottal-Inn,09277
+DE22B,Straubing-Bogen,09278
+DE259,Nürnberger Land,09574
+DE25A,Neustadt a. d. Aisch-Bad Windsheim,09575
+DE25B,Roth,09576
+DE144,"Ulm, Stadtkreis",08421
+DE145,Alb-Donau-Kreis,08425
+DE146,Biberach,08426
+DE128,Rhein-Neckar-Kreis,08226
+DE129,"Pforzheim, Stadtkreis",08231
+DE12A,Calw,08235
+DE12B,Enzkreis,08236
+DE22C,Dingolfing-Landau,09279
+DE231,"Amberg, Kreisfreie Stadt",09361
+DE232,"Regensburg, Kreisfreie Stadt",09362
+DE233,"Weiden i. d. Opf, Kreisfreie Stadt",09363
+DE234,Amberg-Sulzbach,09371
+DE21G,Mühldorf a. Inn,09183
+DE21H,"München, Landkreis",09184
+DE21I,Neuburg-Schrobenhausen,09185
+DE21J,Pfaffenhofen a. d. Ilm,09186
+DE80O,Ludwigslust-Parchim,13076
+DE278,Günzburg,09774
+DE80M,Nordwestmecklenburg,13074
+DEB12,Ahrweiler,07131
+DEC05,Saarpfalz-Kreis,10045
+DED52,Leipzig,14729
+DED53,Nordsachsen,14730
+DEE01,"Dessau-Roßlau, Kreisfreie Stadt",15001
+DE279,Neu-Ulm,09775
+DE27A,Lindau (Bodensee),09776
+DE27B,Ostallgäu,09777
+DEC06,St. Wendel,10046
+DED21,"Dresden, Kreisfreie Stadt",14612
+DED2C,Bautzen,14625
+DEA1A,"Wuppertal, Kreisfreie Stadt",05124
+DEA38,Warendorf,05570
+DEA41,"Bielefeld, Kreisfreie Stadt",05711
+DEA42,Gütersloh,05754
+DEA43,Herford,05758
+DEA44,Höxter,05762
+DEB38,"Speyer, Kreisfreie Stadt",07318
+DE40D,Ostprignitz-Ruppin,12068
+DE40E,Potsdam-Mittelmark,12069
+DEA1B,Kleve,05154
+DEA1C,Mettmann,05158
+DEA1D,Rhein-Kreis Neuss,05162
+DEA1E,Viersen,05166
+DEB39,"Worms, Kreisfreie Stadt",07319
+DEB3A,"Zweibrücken, Kreisfreie Stadt",07320
+DEB3B,Alzey-Worms,07331
+DEB3C,Bad Dürkheim,07332
+DEB3D,Donnersbergkreis,07333
+DEE02,"Halle (Saale), Kreisfreie Stadt",15002
+DE721,"Gießen, Landkreis",06531
+DE722,Lahn-Dill-Kreis,06532
+DE723,Limburg-Weilburg,06533
+DE724,Marburg-Biedenkopf,06534
+DEB13,Altenkirchen (Westerwald),07132
+DEB14,Bad Kreuznach,07133
+DEB15,Birkenfeld,07134
+DEE03,"Magdeburg, Kreisfreie Stadt",15003
+DEE04,Altmarkkreis Salzwedel,15081
+DEE05,Anhalt-Bitterfeld,15082
+DEA45,Lippe,05766
+DE916,Goslar,03153
+DE917,Helmstedt,03154
+DE918,Northeim,03155
+DE91A,Peine,03157
+DE11A,Schwäbisch Hall,08127
+DE11B,Main-Tauber-Kreis,08128
+DE11C,Heidenheim,08135
+DEE09,Harz,15085
+DEE0A,Mansfeld-Südharz,15087
+DEA1F,Wesel,05170
+DEA46,Minden-Lübbecke,05770
+DEA47,Paderborn,05774
+DEA51,"Bochum, Kreisfreie Stadt",05911
+DEA52,"Dortmund, Kreisfreie Stadt",05913
+DEA53,"Hagen, Kreisfreie Stadt",05914
+DEB3E,Germersheim,07334
+DE27C,Unterallgäu,09778
+DE27D,Donau-Ries,09779
+DE27E,Oberallgäu,09780
+DE21D,Garmisch-Partenkirchen,09180
+DE21E,Landsberg am Lech,09181
+DE21F,Miesbach,09182
+DE23A,Tirschenreuth,09377
+DE241,"Bamberg, Kreisfreie Stadt",09461
+DEA22,"Bonn, Kreisfreie Stadt",05314
+DEA23,"Köln, Kreisfreie Stadt",05315
+DEA24,"Leverkusen, Kreisfreie Stadt",05316
+DEA26,Düren,05358
+DEA27,Rhein-Erft-Kreis,05362
+DEB3F,"Kaiserslautern, Landkreis",07335
+DEB3G,Kusel,07336
+DEE06,Jerichower Land,15086
+DE40F,Prignitz,12070
+DE40G,Spree-Neiße,12071
+DE725,Vogelsbergkreis,06535
+DE113,Esslingen,08116
+DE114,Göppingen,08117
+DE115,Ludwigsburg,08118
+DE116,Rems-Murr-Kreis,08119
+DEB17,Mayen-Koblenz,07137
+DEB18,Neuwied,07138
+DEB1A,Rhein-Lahn-Kreis,07141
+DEE07,Börde,15083
+DEE08,Burgenlandkreis,15084
+DEA54,"Hamm, Kreisfreie Stadt",05915
+DEA55,"Herne, Kreisfreie Stadt",05916
+DE731,"Kassel, Kreisfreie Stadt",06611
+DE732,Fulda,06631
+DE733,Hersfeld-Rotenburg,06632
+DE91B,Wolfenbüttel,03158
+DE242,"Bayreuth, Kreisfreie Stadt",09462
+DE243,"Coburg, Kreisfreie Stadt",09463
+DE244,"Hof, Kreisfreie Stadt",09464
+DE245,"Bamberg, Landkreis",09471
+DED2D,Görlitz,14626
+DED2E,Meißen,14627
+DED2F,Sächsische Schweiz-Osterzgebirge,14628
+DEA56,Ennepe-Ruhr-Kreis,05954
+DEA57,Hochsauerlandkreis,05958
+DEA58,Märkischer Kreis,05962
+DE91C,Göttingen,03159
+DE922,Diepholz,03251
+DE300,Berlin,11000
+DEA28,Euskirchen,05366
+DEA29,Heinsberg,05370
+DEA2A,Oberbergischer Kreis,05374
+DEA2B,Rheinisch-Bergischer Kreis,05378
+DEB3H,Südliche Weinstraße,07337
+DEB3I,Rhein-Pfalz-Kreis,07338
+DEB3J,Mainz-Bingen,07339
+DE401,"Brandenburg an der Havel, Kreisfreie Stadt",12051
+DE402,"Cottbus, Kreisfreie Stadt",12052
+DE403,"Frankfurt (Oder), Kreisfreie Stadt",12053
+DE404,"Potsdam, Kreisfreie Stadt",12054
+DE405,Barnim,12060
+DE117,"Heilbronn, Stadtkreis",08121
+DE118,"Heilbronn, Landkreis",08125
+DEB1B,Westerwaldkreis,07143
+DEB1C,Cochem-Zell,07135
+DEB1D,Rhein-Hunsrück-Kreis,07140
+DEB21,"Trier, Kreisfreie Stadt",07211
+DE26B,"Schweinfurt, Landkreis",09678
+DE26C,"Würzburg, Landkreis",09679
+DE271,"Augsburg, Kreisfreie Stadt",09761
+DE272,"Kaufbeuren, Kreisfreie Stadt",09762
+DE273,"Kempten (Allgäu), Kreisfreie Stadt",09763
+DE40H,Teltow-Fläming,12072
+DE40I,Uckermark,12073
+DE501,"Bremen, Kreisfreie Stadt",04011
+DE502,"Bremerhaven, Kreisfreie Stadt",04012
+DE11D,Ostalbkreis,08136
+DE121,"Baden-Baden, Stadtkreis",08211
+DE122,"Karlsruhe, Stadtkreis",08212
+DE123,"Karlsruhe, Landkreis",08215
+DED41,"Chemnitz, Kreisfreie Stadt",14511
+DED42,Erzgebirgskreis,14521
+DED43,Mittelsachsen,14522
+DE408,Havelland,12063
+DE409,Märkisch-Oderland,12064
+DE40A,Oberhavel,12065
+DE734,"Kassel, Landkreis",06633
+DE735,Schwalm-Eder-Kreis,06634
+DE736,Waldeck-Frankenberg,06635
+DE112,Böblingen,08115
+DEA2C,Rhein-Sieg-Kreis,05382
+DEA2D,Städteregion Aachen,05334
+DEA31,"Bottrop, Kreisfreie Stadt",05512
+DEA32,"Gelsenkirchen, Kreisfreie Stadt",05513
+DEA33,"Münster, Kreisfreie Stadt",05515
+DE716,Darmstadt-Dieburg,06432
+DE717,Groß-Gerau,06433
+DE718,Hochtaunuskreis,06434
+DE719,Main-Kinzig-Kreis,06435
+DE274,"Memmingen, Kreisfreie Stadt",09764
+DE119,Hohenlohekreis,08126
+DEB22,Bernkastel-Wittlich,07231
+DEB23,Eifelkreis Bitburg-Prüm,07232
+DEB24,Vulkaneifel,07233
+DE80N,Vorpommern-Greifswald,13075
+DE275,Aichach-Friedberg,09771
+DE124,Rastatt,08216
+DE125,"Heidelberg, Stadtkreis",08221
+DE126,"Mannheim, Stadtkreis",08222
+DE127,Neckar-Odenwald-Kreis,08225
+DE21C,Fürstenfeldbruck,09179
+DED44,Vogtlandkreis,14523
+DED45,Zwickau,14524
+DED51,"Leipzig, Kreisfreie Stadt",14713
+DEA34,Borken,05554
+DE276,"Augsburg, Landkreis",09772
+DE277,Dillingen a.d. Donau,09773
+DE40B,Oberspreewald-Lausitz,12066
+DEB3K,Südwestpfalz,07340
+DEC01,Regionalverband Saarbrücken,10041
+DEC02,Merzig-Wadern,10042
+DEC03,Neunkirchen,10043
+DEC04,Saarlouis,10044
+DEA35,Coesfeld,05558
+DEA36,Recklinghausen,05562
+DEA37,Steinfurt,05566
+DE40C,Oder-Spree,12067
+DE71A,Main-Taunus-Kreis,06436
+DE71B,Odenwaldkreis,06437
+DE71C,"Offenbach, Landkreis",06438
+DE94H,Wittmund,03462
+DEA11,"Düsseldorf, Kreisfreie Stadt",05111
+DEA12,"Duisburg, Kreisfreie Stadt",05112
+DEA13,"Essen, Kreisfreie Stadt",05113
+DEA14,"Krefeld, Kreisfreie Stadt",05114
+DEA15,"Mönchengladbach, Kreisfreie Stadt",05116
+DEA16,"Mülheim an der Ruhr, Kreisfreie Stadt",05117
+DEA17,"Oberhausen, Kreisfreie Stadt",05119
+DEA18,"Remscheid, Kreisfreie Stadt",05120
+DEA19,"Solingen, Kreisfreie Stadt",05122
+DEB25,Trier-Saarburg,07235
+DEB31,"Frankenthal (Pfalz), Kreisfreie Stadt",07311
+DEB32,"Kaiserslautern, Kreisfreie Stadt",07312
+DEB33,"Landau in der Pfalz, Kreisfreie Stadt",07313
+DEB34,"Ludwigshafen am Rhein, Kreisfreie Stadt",07314
+DEB35,"Mainz, Kreisfreie Stadt",07315
+DEB36,"Neustadt an der Weinstraße, Kreisfreie Stadt",07316
+DEB37,"Pirmasens, Kreisfreie Stadt",07317
+DE71D,Rheingau-Taunus-Kreis,06439
+DE71E,Wetteraukreis,06440
+DE914,Gifhorn,03151
+DEE0D,Stendal,15090
+DEE0E,Wittenberg,15091
+DEF01,"Flensburg, Kreisfreie Stadt",01001
+DEF02,"Kiel, Kreisfreie Stadt",01002
+DEF03,"Lübeck, Kreisfreie Stadt",01003
+DEG09,Unstrut-Hainich-Kreis,16064
+DEG0A,Kyffhäuserkreis,16065
+DEG0B,Schmalkalden-Meiningen,
+DEF04,"Neumünster, Kreisfreie Stadt",01004
+DEF05,Dithmarschen,01051
+DEF06,Herzogtum Lauenburg,01053
+DEG0C,Gotha,16067
+DEG0D,Sömmerda,16068
+DEG0E,Hildburghausen,16069
+DEF07,Nordfriesland,01054
+DEG0F,Ilm-Kreis,
+DEG0G,Weimarer Land,16071
+DEG0H,Sonneberg,
+DEF08,Ostholstein,01055
+DEF09,Pinneberg,01056
+DEF0A,Plön,01057
+DEG0I,Saalfeld-Rudolstadt,
+DEG0J,Saale-Holzland-Kreis,16074
+DEG0K,Saale-Orla-Kreis,16075
+DEE0B,Saalekreis,15088
+DEE0C,Salzlandkreis,15089
+DEG01,"Erfurt, Kreisfreie Stadt",16051
+DEG02,"Gera, Kreisfreie Stadt",16052
+DEG03,"Jena, Kreisfreie Stadt",16053
+DEG04,"Suhl, Kreisfreie Stadt",
+DEG05,"Weimar, Kreisfreie Stadt",16055
+DEG06,Eichsfeld,16061
+DEG07,Nordhausen,16062
+DEG0P,Wartburgkreis,
+DEF0B,Rendsburg-Eckernförde,01058
+DEF0C,Schleswig-Flensburg,01059
+DEF0D,Segeberg,01060
+DEF0E,Steinburg,01061
+DEF0F,Stormarn,01062
+DEG0L,Greiz,16076
+DEG0M,Altenburger Land,16077
+DEG0N,"Eisenach, Kreisfreie Stadt",

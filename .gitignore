@@ -33,10 +33,9 @@ dist/
 # macOS
 .DS_Store
 
-# Large / generated data
-geodata_raw/
-geodata_clean/
+# Generated data / artifacts
 results/
+results_*/
 
 # Temporary files (e.g. Excel lock files)
 ~$*

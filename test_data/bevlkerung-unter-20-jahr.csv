@@ -1,4 +1,4 @@
-﻿"Kreis";"Anteil (< 20 J.) (ARS)";"Anteil (< 20 J.) (Kreis)";"Anteil (< 20 J.) (Ins)";"Anteil (< 20 J.) (Abs)";"Anteil (< 20 J.) (value)"
+﻿"Kreis";ID;Kreisname;"Anteil (< 20 J.) (Ins)";"Anteil (< 20 J.) (Abs)";"Anteil (< 20 J.) (value)"
 0;"01001";"Flensburg, Stadt";96326;17040;17,7
 1;"01002";"Kiel, Stadt";252668;42329;16,8
 2;"01003";"Lübeck, Stadt";216889;36624;16,9

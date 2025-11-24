@@ -1,0 +1,2 @@
+recursive-include geo_mapper/geodata_clean *
+recursive-include geo_mapper/geodata_raw *

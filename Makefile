@@ -7,10 +7,10 @@ venv:
 	python3 -m venv .venv
 
 install: venv
-	$(PIP) install -r requirements.txt
+	$(PIP) install -e .
 
 run:
-	$(PYTHON) clean_geojson_data.py
+	$(PYTHON) -m geo_mapper --help
 
 clean:
-	rm -rf geodata_clean
+	rm -rf results
