@@ -232,11 +232,10 @@ Standardmäßig werden (in dieser Reihenfolge) folgende **automatische** Mapper 
 
 3. **`unique_name`** – eindeutig normalisierte Namen  
    - Nutzt eine stark normalisierte Namensform: Kleinschreibung, deutsche Umlaute (`ä` → `ae`, `ö` → `oe`, `ü` → `ue`), Entfernen von Ziffern, Ersetzen von Satzzeichen/Sonderzeichen durch Leerzeichen, Zusammenziehen mehrfacher Leerzeichen.  
-   - Über **alle** geladenen Geodatensätze (z. B. verschiedene Jahre einer NUTS-Ebene) wird gezählt, wie oft ein normalisierter Name vorkommt.  
-   - Fall A: der normalisierte Name kommt genau **einmal** vor → direkte Zuordnung zu dieser ID.  
-   - Fall B: der Name kommt in mehreren Jahrgängen vor, aber immer mit **derselben** ID → Zuordnung zur neuesten Version (höchstes Jahr im Dateipfad).  
-   - In allen anderen Fällen (Name fehlt vollständig oder ist mehrfach mit unterschiedlichen IDs belegt) wird **nicht** gemappt; solche Fälle werden intern als „no match“ bzw. „ambiguous“ gezählt.  
-   - Der Mapper ist damit gut geeignet für „saubere“ Kreis-/Gemeindenamen, bleibt aber bewusst vorsichtig bei Mehrdeutigkeiten.
+   - Für **jeden Geodatensatz (CSV)** wird getrennt gezählt, wie oft ein normalisierter Name vorkommt; ein Eingabe-Eintrag kann dadurch mehreren Jahrgängen/Versionen zugeordnet werden, weil jeder Datensatz separat analysiert wird.  
+   - Innerhalb eines einzelnen Geodatensatzes wird nur dann gemappt, wenn der normalisierte Name eindeutig auf **eine** Geodaten-ID zeigt (keine konkurrierenden IDs in diesem Datensatz).  
+   - In allen anderen Fällen (Name fehlt in diesem Datensatz vollständig oder ist dort mit unterschiedlichen IDs belegt) wird **nicht** gemappt; solche Fälle werden intern als „no match“ bzw. „ambiguous“ gezählt.  
+   - Der Mapper ist damit gut geeignet für „saubere“ Kreis-/Gemeindenamen, bleibt aber bewusst vorsichtig bei Mehrdeutigkeiten innerhalb eines Datensatzes.
 
 4. **`regex_replace`** – Varianten über reguläre Ausdrücke  
    - Erzeugt aus dem Originalnamen systematisch Varianten mithilfe einer Liste von `(Regex, Ersetzung)`-Regeln.  

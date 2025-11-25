@@ -1,4 +1,5 @@
-"""Unique-name mapper: map when exactly one geodata row matches the normalized name.
+"""Unique-name mapper: map when exactly one geodata ID per dataset
+matches the normalized name.
 
 Normalization rules before comparing names:
 - lower case only (casefold)
@@ -37,58 +38,57 @@ def _collect_geodata_index(
     int,
     int,
 ]:
-    """Build indexes for normalized names across all frames.
+    """Build indexes for normalized names **within a single geodata dataset**.
+
+    The mapper is designed to work per Geodaten-CSV. An Eingabewert kann
+    deshalb in mehreren Jahrgängen/Versionen gemappt werden, weil jede CSV
+    separat analysiert wird. Entscheidend ist nur die Eindeutigkeit innerhalb
+    eines einzelnen Datensatzes.
 
     Returns:
-    - name_counts: Counter of occurrences per normalized name across all frames
-    - unique_map_by_name: names that appear exactly once overall mapped to (id, csv_path)
+    - name_counts: Counter of occurrences per normalized name in this dataset
+    - unique_map_by_name: names that map eindeutig auf genau eine Geodaten-ID
     - hits_by_name: mapping to all hits (id, csv_path, original_name) for diagnostics
-    - label_by_name: for names that are unique overall, their original geodata label
-    - frames_indexed: total frames processed
-    - frames_with_required: frames that contained ['name', 'id']
+    - label_by_name: for unique names, their original geodata label
+    - frames_indexed: always 1 for this per-dataset variant
+    - frames_with_required: 1 if the frame contained ['name', 'id'], else 0
     """
+    if not geodata_frames:
+        return Counter(), {}, {}, {}, 0, 0
+
+    csv_path, frame = geodata_frames[0]
+
     name_counts: Counter = Counter()
     hits_by_name: Dict[str, List[Tuple[str, Path, str]]] = defaultdict(list)
-    frames_with_required = 0
-    frames_indexed = len(geodata_frames)
-    for csv_path, frame in geodata_frames:
-        # Expect 'name' and 'id' columns in geodata
-        if not {"name", "id"}.issubset(frame.columns):
-            continue
-        frames_with_required += 1
+
+    if {"name", "id"}.issubset(frame.columns):
         for name, gid in zip(frame["name"], frame["id"], strict=False):
             n = normalize_string(name)
             name_counts[n] += 1
             hits_by_name[n].append((str(gid), csv_path, str(name)))
-
-    def _version_key(p: Path) -> int:
-        try:
-            return int(p.parent.name)
-        except (TypeError, ValueError):
-            return -1
+        frames_with_required = 1
+    else:
+        frames_with_required = 0
 
     unique_map_by_name: Dict[str, Tuple[str, Path]] = {}
     label_by_name: Dict[str, str] = {}
-    # First pass: strictly unique across all frames
-    for n, count in name_counts.items():
-        if count == 1 and len(hits_by_name[n]) == 1:
-            gid, csv_path, label = hits_by_name[n][0]
-            unique_map_by_name[n] = (gid, csv_path)
-            label_by_name[n] = label
-    # Second pass: consistent id across frames (ids_count == 1)
+
+    # Eindeutig ist ein Name genau dann, wenn er in diesem Datensatz
+    # nur auf eine einzige Geodaten-ID zeigt – unabhängig davon, wie
+    # viele Zeilen diese ID tragen.
     for n, triples in hits_by_name.items():
-        if n in unique_map_by_name:
-            continue
         ids = {t[0] for t in triples}
         if len(ids) == 1:
             gid = next(iter(ids))
-            # choose the newest version path as representative
-            best = max(triples, key=lambda t: _version_key(t[1]))
-            unique_map_by_name[n] = (gid, best[1])
-            label_by_name[n] = best[2]
+            first_gid, first_path, first_label = triples[0]
+            assert gid == first_gid
+            unique_map_by_name[n] = (gid, first_path)
+            label_by_name[n] = first_label
+
+    frames_indexed = 1
+
     logger.debug(
-        "Indexed %d geodata frame(s); %d with required columns; %d unique normalized names available",
-        frames_indexed,
+        "Indexed 1 geodata frame; %d with required columns; %d unique normalized names available",
         frames_with_required,
         len(unique_map_by_name),
     )
@@ -105,7 +105,8 @@ def _collect_geodata_index(
 def unique_name_mapper(
     df_slice: pd.DataFrame, geodata_frames: List[Tuple[Path, pd.DataFrame]], source_col: str
 ) -> pd.DataFrame:
-    """Map rows where the source value appears exactly once across all geodata.
+    """Map rows where the source value points eindeutig auf eine Geodaten-ID
+    innerhalb des übergebenen Geodaten-Datensatzes.
 
     Returns a DataFrame containing 'mapped_by', 'mapped_value' and 'mapped_source'
     with the same index as `df_slice`.

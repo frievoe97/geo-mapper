@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "geo-mapper"
-version = "0.1.0b1"
+version = "0.1.0b2"
 description = "CLI to map CSV/Excel rows onto German NUTS/LAU geodata with interactive helpers."
 readme = "README.md"
 requires-python = ">=3.10"
