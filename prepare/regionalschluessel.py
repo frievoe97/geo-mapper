@@ -1,4 +1,4 @@
-"""Regionalschlüssel-Ergänzungen aus unterschiedlichen Quellen."""
+"""Regionalschlüssel additions from different sources."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def _clean_cell(value) -> str:
 
 @dataclass(frozen=True)
 class RegionalschluesselSource:
-    """Definition einer Quelle für Regionalschlüssel."""
+    """Definition of a source for Regionalschlüssel."""
 
     relative_path: str
     sheet_name: str
@@ -34,10 +34,10 @@ class RegionalschluesselSource:
     skip_nuts_values: tuple[str, ...] = field(default_factory=tuple)
 
     def load_rows(self, base_dir: Path, log: logging.Logger) -> list[tuple[str, str]]:
-        """Lese alle (NUTS, Regionalschlüssel)-Paare aus dieser Quelle."""
+        """Read all (NUTS, Regionalschlüssel) pairs from this source."""
         path = base_dir / self.relative_path
         if not path.exists():
-            log.warning("Regionalschlüsselquelle %s fehlt (%s)", self.description, path)
+            log.warning("Regionalschlüssel source %s is missing (%s)", self.description, path)
             return []
         try:
             df = pd.read_excel(
@@ -49,7 +49,7 @@ class RegionalschluesselSource:
             )
         except Exception as exc:  # pylint: disable=broad-except
             log.error(
-                "Fehler beim Lesen der Regionalschlüsselquelle %s (%s): %s",
+                "Error reading Regionalschlüssel source %s (%s): %s",
                 self.description,
                 path,
                 exc,
@@ -100,7 +100,7 @@ REGION_SOURCES: tuple[RegionalschluesselSource, ...] = (
 def load_regionalschluessel_mapping(
     base_dir: Path, log: logging.Logger | None = None
 ) -> dict[str, str]:
-    """Lade alle Regionalschlüssel aus den konfigurierten Quellen."""
+    """Load all Regionalschlüssel from the configured sources."""
     log = log or logger
     mapping: dict[str, str] = {}
     for source in REGION_SOURCES:
@@ -111,12 +111,12 @@ def load_regionalschluessel_mapping(
                 mapping[nuts_id] = region_code
                 added += 1
         log.info(
-            "%s liefert %d Einträge (%d neu)",
+            "%s yields %d entries (%d new)",
             source.description,
             len(rows),
             added,
         )
-    log.info("Regionalschlüssel geladen: %d eindeutige Werte", len(mapping))
+    log.info("Regionalschlüssel loaded: %d unique values", len(mapping))
     return mapping
 
 

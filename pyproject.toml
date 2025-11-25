@@ -9,7 +9,7 @@ description = "CLI to map CSV/Excel rows onto German NUTS/LAU geodata with inter
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Proprietary"}
-authors = [{name = "Friedrich Volkers"}]
+authors = [{name = "Friedrich Volkers", email = "friedrich.voelkers@me.com"}]
 keywords = ["geodata", "NUTS", "LAU", "GIS", "CSV"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -28,7 +28,13 @@ dependencies = [
     "questionary==2.1.1",
     "openpyxl==3.1.5",
     "xlrd==2.0.1",
+    "pyyaml==6.0.2",
 ]
+
+[project.urls]
+Homepage = "https://friedrichvoelkers.de"
+Repository = "https://github.com/frievoe97/geo-mapper"
+Issues = "https://github.com/frievoe97/geo-mapper/issues"
 
 [project.scripts]
 geo-mapper = "geo_mapper.cli:main"

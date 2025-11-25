@@ -46,35 +46,35 @@ def normalize_many(values: Iterable[object]) -> list[str]:
     return [normalize_string(v) for v in values]
 
 
-def normalize_id(value: object) -> str:
-    """Normalize an ID value for robust comparisons.
+# def normalize_id(value: object) -> str:
+#     """Normalize an ID value for robust comparisons.
+#
+#     Rules:
+#     - treat pandas/NumPy NA/NaN as empty
+#     - convert to string
+#     - uppercase and strip surrounding whitespace
+#     - remove spaces and punctuation, but keep all letters and digits
+#
+#     Examples:
+#     - \"de 3\" -> \"DE3\"
+#     - \"DE-03\" -> \"DE03\"
+#     - \"01001\" -> \"01001\"
+#     - \"NUTS3\" -> \"NUTS3\"
+#     """
+#     if value is None:
+#         return ""
+#     try:
+#         if pd.isna(value):
+#             return ""
+#     except TypeError:
+#         if isinstance(value, float) and math.isnan(value):
+#             return ""
+#     text = str(value).strip().upper()
+#     # keep only letters and digits; drop separators/whitespace
+#     text = re.sub(r"[^0-9A-Z]+", "", text)
+#     return text
 
-    Rules:
-    - treat pandas/NumPy NA/NaN as empty
-    - convert to string
-    - uppercase and strip surrounding whitespace
-    - remove spaces and punctuation, but keep all letters and digits
 
-    Examples:
-    - \"de 3\" -> \"DE3\"
-    - \"DE-03\" -> \"DE03\"
-    - \"01001\" -> \"01001\"
-    - \"NUTS3\" -> \"NUTS3\"
-    """
-    if value is None:
-        return ""
-    try:
-        if pd.isna(value):
-            return ""
-    except TypeError:
-        if isinstance(value, float) and math.isnan(value):
-            return ""
-    text = str(value).strip().upper()
-    # keep only letters and digits; drop separators/whitespace
-    text = re.sub(r"[^0-9A-Z]+", "", text)
-    return text
-
-
-def normalize_id_many(values: Iterable[object]) -> list[str]:
-    """Normalize an iterable of ID values into a list of strings."""
-    return [normalize_id(v) for v in values]
+# def normalize_id_many(values: Iterable[object]) -> list[str]:
+#     """Normalize an iterable of ID values into a list of strings."""
+#     return [normalize_id(v) for v in values]

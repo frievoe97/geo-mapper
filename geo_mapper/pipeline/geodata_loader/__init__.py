@@ -36,9 +36,11 @@ def _ensure_standard_id_column(csv_path: Path, frame: pd.DataFrame) -> pd.DataFr
         if id_source is not None:
             frame = frame.copy()
             if id_source == "id_nuts" and "id_ars" in frame.columns:
-                frame["id"] = frame["id_nuts"].fillna(frame["id_ars"])
+                combined = frame["id_nuts"].copy()
+                combined = combined.fillna(frame["id_ars"])
+                frame.loc[:, "id"] = combined
             else:
-                frame["id"] = frame[id_source]
+                frame.loc[:, "id"] = frame[id_source]
             logger.debug(
                 "Normalized geodata IDs for %s using column '%s'",
                 csv_path.name,
@@ -104,7 +106,7 @@ def _report_loading(paths: list[Path]) -> None:
     logger.info("Loading geodata CSV files:")
 
     for path in paths:
-        path_display = path.name  # nur Dateiname
+        path_display = path.name  # file name only
         logger.info("%s", path_display)
 
 

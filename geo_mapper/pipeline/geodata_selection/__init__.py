@@ -22,6 +22,7 @@ from ..constants import (
     PROMPT_SELECT_GEODATA_LEVEL,
     PROMPT_SELECT_GEODATA_VERSION,
 )
+from ..utils.ui import DEFAULT_STYLE
 
 
 def _dataset_dir_for_level(level_choice: str) -> Optional[Path]:
@@ -49,7 +50,12 @@ def _available_versions(level_choice: str) -> List[str]:
 
 def _prompt_select(message: str, choices: list[str], default: str) -> str:
     """Ask the user to select one of the provided choices."""
-    selection = questionary.select(message, choices=choices, default=default).ask()
+    selection = questionary.select(
+        message,
+        choices=choices,
+        default=default,
+        style=DEFAULT_STYLE,
+    ).ask()
     if not selection:
         raise SystemExit(f"No choice made for '{message}'.")
     return selection
@@ -127,14 +133,14 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
                     set_geodata_version(version_choice)
                     return dataframe
 
-    # Interactive selection of the level – with human-readable German descriptions
+    # Interactive selection of the level – with human-readable descriptions
     try:
         from questionary import Choice
     except ImportError:
         # Fallback without Choice helper: use descriptive labels and map back to internal values
         level_titles = LEVEL_TITLES
         level_values_fallback: List[str] = list(LEVEL_VALUES)
-        # Build display labels including the German description
+        # Build display labels including the human-readable description
         level_labels = [level_titles[v] for v in level_values_fallback]
         level_choices_fb = _with_unknown(level_labels)
         default_label = level_titles.get("NUTS 3", "NUTS 3")
@@ -156,6 +162,7 @@ def select_geodata_step(dataframe: pd.DataFrame) -> pd.DataFrame:
             PROMPT_SELECT_GEODATA_LEVEL,
             choices=level_choices,
             default=default_value,
+            style=DEFAULT_STYLE,
         ).ask()
 
     # Map UI labels back to internal level values if needed

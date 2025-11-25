@@ -45,12 +45,15 @@ DATASET_CHOICES: Final[tuple[str, ...]] = ("NUTS", "LAU")
 # Mapping of geodata dataset families to the ID columns that should be exported.
 # Each entry is a list of (source_column_name, export_column_name) tuples.
 GEODATA_ID_COLUMNS: Final[dict[str, list[tuple[str, str]]]] = {
+    # LAU: single ID column 'id' -> export as 'geodata_id'
     "lau": [
-        ("id", "geodaten_id"),
+        ("id", "geodata_id"),
     ],
+    # NUTS: two ID columns 'id_nuts' and 'id_ars' -> export as
+    # 'geodata_id_nuts' and 'geodata_id_ars'
     "nuts": [
-        ("id_nuts", "geodaten_id_nuts"),
-        ("id_ars", "geodaten_id_ars"),
+        ("id_nuts", "geodata_id_nuts"),
+        ("id_ars", "geodata_id_ars"),
     ],
 }
 
@@ -138,7 +141,7 @@ REGEX_REPLACEMENTS: Final[list[tuple[str, str]]] = [
     (r"\bBurgenlandkreis\b", "Burgenland (D)"),
     (r"\bSächs\.", "Sächsische"),
     (r"\bRegionalverband\b", "Stadtverband"),
-    (r"\bZwickau\b", "Zwichau"), # NUTS 2010 Level 3 Fehlschreibung
+    (r"\bZwickau\b", "Zwichau"), # NUTS 2010 Level 3 misspelling
 (r"\bStadt der FernUniversität\b", "Kreisfreie Stadt"),
 (r"\bKlingenstadt\b", "Kreisfreie Stadt"),
 (r"\bFreie und Hansestadt\b", ""),

@@ -7,6 +7,7 @@ import questionary
 
 from ..storage import get_selections, set_selected_mappers, get_auto_select_mappers
 from ..constants import DEFAULT_MAPPERS, PROMPT_SELECT_MAPPERS
+from ..utils.ui import DEFAULT_STYLE
 
 
 def _default_mappers_for(selections) -> list[str]:
@@ -53,6 +54,7 @@ def select_mappers_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         selected = questionary.checkbox(
             PROMPT_SELECT_MAPPERS,
             choices=list(DEFAULT_MAPPERS),
+            style=DEFAULT_STYLE,
         ).ask()
     else:
         choices = [
@@ -65,6 +67,7 @@ def select_mappers_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         selected = questionary.checkbox(
             PROMPT_SELECT_MAPPERS,
             choices=choices,
+            style=DEFAULT_STYLE,
         ).ask()
 
     if not selected:

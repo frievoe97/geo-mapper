@@ -9,8 +9,14 @@ import logging
 import pandas as pd
 import questionary
 
-from ..storage import set_input_name, set_output_root
+from ..storage import (
+    set_input_name,
+    set_output_root,
+    get_selections,
+    set_worksheet_name,
+)
 from ..constants import PROMPT_SELECT_WORKSHEET
+from ..utils.ui import DEFAULT_STYLE
 
 
 logger = logging.getLogger(__name__)
@@ -45,6 +51,9 @@ def _load_excel(path: Path) -> pd.DataFrame:
     engine = None
     if ext == ".xls":
         engine = "xlrd"
+    selections = get_selections()
+    meta = getattr(selections, "meta_config", None)
+
     try:
         xls = pd.ExcelFile(path, engine=engine)
     except (OSError, ValueError) as exc:
@@ -52,17 +61,32 @@ def _load_excel(path: Path) -> pd.DataFrame:
     sheets = list(xls.sheet_names)
     if not sheets:
         raise ValueError(f"Excel file has no sheets: {path}")
+
+    # Optional: reuse worksheet from meta.json if present and valid
+    worksheet_from_meta: str | None = None
+    if isinstance(meta, dict):
+        ws = meta.get("worksheet")
+        if isinstance(ws, str):
+            worksheet_from_meta = ws
+
     if len(sheets) == 1:
         chosen = sheets[0]
+    elif worksheet_from_meta and worksheet_from_meta in sheets:
+        chosen = worksheet_from_meta
     else:
         default_sheet = sheets[0]
         chosen = questionary.select(
             PROMPT_SELECT_WORKSHEET,
             choices=sheets,
             default=default_sheet,
+            style=DEFAULT_STYLE,
         ).ask()
     if not chosen:
         raise SystemExit("No worksheet selected.")
+
+    # Remember the chosen worksheet for later meta.yaml generation
+    set_worksheet_name(chosen)
+
     logger.info("Loading Excel %s sheet=%s", str(path), chosen)
     try:
         return pd.read_excel(path, sheet_name=chosen, engine=engine)
@@ -115,6 +139,6 @@ def load_data_step(path: Path) -> pd.DataFrame:
     return df
 
 
-def load_csv_step(path: Path) -> pd.DataFrame:
-    """Backward-compatible alias for load_data_step."""
-    return load_data_step(path)
+# def load_csv_step(path: Path) -> pd.DataFrame:
+#     """Backward-compatible alias for load_data_step."""
+#     return load_data_step(path)

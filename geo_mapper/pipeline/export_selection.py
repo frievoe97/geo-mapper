@@ -16,13 +16,14 @@ from .storage import (
     get_auto_export_source,
 )
 from .constants import PROMPT_SELECT_EXPORT_SOURCE
+from .utils.ui import DEFAULT_STYLE
 
 
 logger = logging.getLogger(__name__)
 
 
-def _geodata_usage() -> List[Tuple[str, int, float, int, float, int]]:
-    """Return per-geodata usage as (source_path, hits, pct_input, geodata_hits, pct_geodata, geodata_total_rows).
+def _geodata_usage() -> List[Tuple[str, int, float, int, float, int, int]]:
+    """Return per-geodata usage as (source_path, hits, pct_input, geodata_hits, pct_geodata, geodata_total_rows, total_input_rows).
 
     Prefer the per-CSV cumulative counts recorded during the mapping step so
     that the values shown here match the logging output exactly. This mirrors
@@ -31,7 +32,7 @@ def _geodata_usage() -> List[Tuple[str, int, float, int, float, int]]:
     usage_counts, total_rows = get_geodata_usage()
     used_ids_by_source, geodata_rows_by_source = get_geodata_geocoverage()
     if usage_counts and total_rows:
-        usage: List[Tuple[str, int, float, int, float, int]] = []
+        usage: List[Tuple[str, int, float, int, float, int, int]] = []
         for source, hits in usage_counts.items():
             if hits <= 0:
                 continue
@@ -43,7 +44,7 @@ def _geodata_usage() -> List[Tuple[str, int, float, int, float, int]]:
                 if total_geodata_rows > 0
                 else 0.0
             )
-            usage.append((str(source), int(hits), pct, used_ids, pct_geodata, total_geodata_rows))
+            usage.append((str(source), int(hits), pct, used_ids, pct_geodata, total_geodata_rows, int(total_rows)))
         # Sort order for sources:
         # 1. Descending by share of mapped input rows (pct_input, t[2])
         # 2. Then descending by share of used geodata rows (pct_geodata, t[4])
@@ -55,7 +56,7 @@ def _geodata_usage() -> List[Tuple[str, int, float, int, float, int]]:
     return []
 
 
-def _choose_single_geodata_source(usage: List[Tuple[str, int, float, int, float, int]]) -> str | None:
+def _choose_single_geodata_source(usage: List[Tuple[str, int, float, int, float, int, int]]) -> str | None:
     """Ask the user to select exactly one geodata source."""
     if not usage:
         return None
@@ -66,25 +67,26 @@ def _choose_single_geodata_source(usage: List[Tuple[str, int, float, int, float,
         # Fallback without Choice helper: simple labels only
         selected = questionary.select(
             PROMPT_SELECT_EXPORT_SOURCE,
-            choices=[source for source, _hits, _pct, _gh, _pg, _tg in usage],
+            choices=[source for source, _hits, _pct, _gh, _pg, _tg, _ti in usage],
+            style=DEFAULT_STYLE,
         ).ask()
     else:
         choices = []
-        for source, hits, pct_input, geodata_hits, pct_geodata, geodata_total in usage:
+        for source, hits, pct_input, geodata_hits, pct_geodata, geodata_total, total_input in usage:
 
             source_display = Path(source).name
 
             title = (
                 f"{source_display} "
-                f"({hits} matches, {pct_input:.1f}% of input rows; "
-                f"{geodata_hits} of {geodata_total} geodata rows, "
-                f"{pct_geodata:.1f}% of geodata rows)"
+                f"({hits} of {total_input} input rows, {pct_input:.1f}%; "
+                f"{geodata_hits} of {geodata_total} geodata rows, {pct_geodata:.1f}%)"
             )
 
             choices.append(Choice(title=title, value=source))
         selected = questionary.select(
             PROMPT_SELECT_EXPORT_SOURCE,
             choices=choices,
+            style=DEFAULT_STYLE,
         ).ask()
 
     return selected or None

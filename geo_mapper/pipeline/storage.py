@@ -19,13 +19,18 @@ class PipelineSelections:
     # Optional dedicated selections for ID and name columns
     id_column: Optional[str] = None
     id_columns: List[str] = field(default_factory=list)
+    id_column_indices: List[int] = field(default_factory=list)
     name_column: Optional[str] = None
+    name_column_index: Optional[int] = None
     # Optional additional value columns to carry through and export
     value_columns: List[str] = field(default_factory=list)
+    value_column_indices: List[int] = field(default_factory=list)
     geodata_type: Optional[str] = None
     nuts_level: Optional[str] = None
     geodata_version: Optional[str] = None
-    json_path: Optional[Path] = None
+    # Optional: selected worksheet name for Excel inputs
+    worksheet_name: Optional[str] = None
+    # json_path: Optional[Path] = None
     # Optional meta-configuration loaded from a JSON file (e.g. column and geodata hints)
     meta_config: Optional[Dict[str, Any]] = None
     # Optional: decide automatically which mappers to run (skip interactive UI)
@@ -65,17 +70,17 @@ def set_id_columns(columns: List[str]) -> None:
     SELECTIONS.id_column = unique[0] if unique else None
 
 
-def get_id_columns() -> List[str]:
-    """Return the list of selected ID columns (may be empty)."""
-    return list(SELECTIONS.id_columns)
+# def get_id_columns() -> List[str]:
+#     """Return the list of selected ID columns (may be empty)."""
+#     return list(SELECTIONS.id_columns)
 
 
-def set_id_column(column: Optional[str]) -> None:
-    """Backwards-compatible setter for a single ID column."""
-    if column is None:
-        set_id_columns([])
-    else:
-        set_id_columns([column])
+# def set_id_column(column: Optional[str]) -> None:
+#     """Backwards-compatible setter for a single ID column."""
+#     if column is None:
+#         set_id_columns([])
+#     else:
+#         set_id_columns([column])
 
 
 def set_name_column(column: Optional[str]) -> None:
@@ -88,6 +93,24 @@ def set_name_column(column: Optional[str]) -> None:
 def set_value_columns(columns: List[str]) -> None:
     """Set the selected value columns (export-only)."""
     SELECTIONS.value_columns = list(columns)
+
+
+def set_id_column_indices(indices: List[int]) -> None:
+    """Store positional indices of the selected ID columns in the original input."""
+
+    SELECTIONS.id_column_indices = list(indices)
+
+
+def set_name_column_index(index: Optional[int]) -> None:
+    """Store positional index of the selected name column in the original input."""
+
+    SELECTIONS.name_column_index = index
+
+
+def set_value_column_indices(indices: List[int]) -> None:
+    """Store positional indices of the selected value columns in the original input."""
+
+    SELECTIONS.value_column_indices = list(indices)
 
 
 def set_input_name(name: str) -> None:
@@ -104,6 +127,18 @@ def get_output_root() -> Optional[Path]:
     """Return the base directory for exports, if configured."""
 
     return SELECTIONS.output_root
+
+
+def set_worksheet_name(name: Optional[str]) -> None:
+    """Remember the selected worksheet name for Excel inputs."""
+
+    SELECTIONS.worksheet_name = name
+
+
+def get_worksheet_name() -> Optional[str]:
+    """Return the selected worksheet name, if any."""
+
+    return SELECTIONS.worksheet_name
 
 
 def set_geodata_export_mode(mode: Optional[str]) -> None:
@@ -157,10 +192,10 @@ def get_export_geodata_source() -> Optional[str]:
     return SELECTIONS.export_geodata_source
 
 
-def get_json_path() -> Optional[Path]:
-    """Return the optional JSON path provided on the CLI."""
-
-    return SELECTIONS.json_path
+# def get_json_path() -> Optional[Path]:
+#     """Return the optional JSON path provided on the CLI."""
+#
+#     return SELECTIONS.json_path
 
 
 def get_meta_config() -> Optional[Dict[str, Any]]:

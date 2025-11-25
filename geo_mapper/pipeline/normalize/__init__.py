@@ -21,5 +21,7 @@ def normalize_source_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         or selections.column
         or dataframe.columns[0]
     )
-    dataframe["normalized_source"] = normalize_many(dataframe[source_col])
-    return dataframe
+    # Work on a copy to avoid chained-assignment / copy-on-write warnings.
+    result = dataframe.copy()
+    result.loc[:, "normalized_source"] = normalize_many(result[source_col])
+    return result

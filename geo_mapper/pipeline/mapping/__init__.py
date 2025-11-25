@@ -177,19 +177,18 @@ def mapping_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         for path, frame in geodata_frames:
             path_str = str(
                 path
-            )  # Schlüssel für Dictionaries → darf NICHT geändert werden!
-            path_display = Path(path).name  # Nur fürs Logging
+            )  # Key for dictionaries → must NOT be changed!
+            path_display = Path(path).name  # Only for logging
 
             per_source_df = per_source_results[path_str]
 
             # Only consider rows that are currently still unmapped in this CSV
             current_unmapped = per_source_df["mapped_value"].isna()
 
-            # Für token_permutation sollen nur noch nicht gemappte Zeilen
-            # überhaupt an den Mapper übergeben werden. Für alle anderen
-            # Mapper bleibt das Verhalten unverändert (sie sehen das volle
-            # DataFrame, aber ihre Ergebnisse werden nur für noch ungemappte
-            # Zeilen übernommen).
+            # For token_permutation only rows that are still unmapped
+            # should be passed to the mapper. For all other mappers the
+            # behaviour remains unchanged (they see the full DataFrame,
+            # but their results are only applied to still-unmapped rows).
             if mapper_name == "token_permutation":
                 input_index = per_source_df.index[current_unmapped]
             else:

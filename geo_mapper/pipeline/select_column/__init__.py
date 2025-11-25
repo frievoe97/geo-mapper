@@ -10,6 +10,9 @@ from ..storage import (
     set_id_columns,
     set_name_column,
     set_value_columns,
+    set_id_column_indices,
+    set_name_column_index,
+    set_value_column_indices,
     get_selections,
 )
 from ..constants import (
@@ -19,17 +22,7 @@ from ..constants import (
     ID_NONE_LABEL,
     NAME_NONE_LABEL,
 )
-
-
-def _first_non_empty_value(series: pd.Series) -> str | None:
-    """Return the first non-empty (non-NaN, non-whitespace) cell from a Series."""
-    for value in series:
-        if pd.isna(value):
-            continue
-        if isinstance(value, str) and not value.strip():
-            continue
-        return str(value)
-    return None
+from ..utils.ui import DEFAULT_STYLE
 
 
 def _sanitize_for_display(text: str) -> str:
@@ -77,6 +70,7 @@ def _prompt_value_renames(
     value_columns: list[str],
     id_columns: list[str],
     name_column: str | None,
+    dataframe: pd.DataFrame,
 ) -> dict[str, str]:
     """Ask for optional renames per selected value column.
 
@@ -92,9 +86,20 @@ def _prompt_value_renames(
 
     renames: dict[str, str] = {}
     for col in value_columns:
+        # Beispiele analog zur Spaltenauswahl anzeigen
+        samples = _first_non_empty_values(dataframe[col], max_examples=3)
+        if not samples:
+            samples = [str(col)]
+        display_col = _sanitize_for_display(str(col))
+        display_examples = ", ".join(_sanitize_for_display(str(sample)) for sample in samples)
+        prompt = (
+            f"New name for '{display_col}' "
+            f"(leave empty to keep current; examples: {display_examples}):"
+        )
         new_name = questionary.text(
-            f"Neuer Name für '{col}' (leer lassen für unverändert):",
-            default=col,
+            prompt,
+            default=str(col),
+            style=DEFAULT_STYLE,
         ).ask()
         normalized = (new_name or col).strip() or col
         base = normalized
@@ -124,10 +129,12 @@ def _choose_columns(
     id_none_label = ID_NONE_LABEL
     name_none_label = NAME_NONE_LABEL
 
-    # The 'none/unknown' options should always be shown first and be selected by default.
-    id_default = id_none_label
+    # The 'none/unknown' options should always be shown first.
     name_default = name_none_label
 
+    # ID columns: behave like value column selection (multi-select via checkbox).
+    # The special "<Do not use an ID column>" entry is only used if the user
+    # actively selects it; pressing ENTER without a selection means: no IDs.
     id_choices = [
         questionary.Choice(title=id_none_label, value=id_none_label),
         *column_choices,
@@ -135,6 +142,7 @@ def _choose_columns(
     id_selection = questionary.checkbox(
         PROMPT_SELECT_ID_COLUMN,
         choices=id_choices,
+        style=DEFAULT_STYLE,
     ).ask() or []
     if id_none_label in id_selection:
         id_columns = []
@@ -153,6 +161,7 @@ def _choose_columns(
         PROMPT_SELECT_NAME_COLUMN,
         choices=name_choices,
         default=name_default,
+        style=DEFAULT_STYLE,
     ).ask()
 
     if not id_columns and not name_column:
@@ -180,11 +189,17 @@ def _choose_columns(
             questionary.checkbox(
                 PROMPT_SELECT_VALUE_COLUMNS,
                 choices=remaining_for_values,
+                style=DEFAULT_STYLE,
             ).ask()
             or []
         )
         if value_columns:
-            value_renames = _prompt_value_renames(value_columns, id_columns, name_column)
+            value_renames = _prompt_value_renames(
+                value_columns,
+                id_columns,
+                name_column,
+                dataframe,
+            )
 
     return id_columns, name_column, list(value_columns), value_renames
 
@@ -200,13 +215,33 @@ def narrow_to_single_column_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         id_columns_meta = meta.get("id_columns")
         name_column_meta = meta.get("name_column")
         value_columns_meta = meta.get("value_columns")
-        if isinstance(value_columns_meta, str):
-            value_columns_meta = [value_columns_meta]
-        elif not isinstance(value_columns_meta, list):
-            value_columns_meta = []
+
+        def _normalize_columns_spec(spec) -> list[str]:
+            """Accept list/str/dict and always return list of column names."""
+            # Dict variant: {\"0\": \"col_a\", \"1\": \"col_b\", ...}
+            if isinstance(spec, dict):
+                try:
+                    items = sorted(
+                        spec.items(),
+                        key=lambda kv: int(str(kv[0])) if str(kv[0]).isdigit() else 0,
+                    )
+                except Exception:
+                    items = list(spec.items())
+                return [str(name) for _idx, name in items]
+            if isinstance(spec, str):
+                return [spec]
+            if isinstance(spec, list):
+                return [str(x) for x in spec]
+            return []
+
+        # value_columns may be a list, string or dict
+        value_columns_meta = _normalize_columns_spec(value_columns_meta)
 
         columns = list(dataframe.columns)
-        if isinstance(id_columns_meta, str):
+        # id_columns may be a list, string or dict
+        if isinstance(id_columns_meta, dict):
+            id_columns_meta = _normalize_columns_spec(id_columns_meta)
+        elif isinstance(id_columns_meta, str):
             id_columns_meta = [id_columns_meta]
         elif not isinstance(id_columns_meta, list):
             id_columns_meta = []
@@ -218,6 +253,10 @@ def narrow_to_single_column_step(dataframe: pd.DataFrame) -> pd.DataFrame:
             if col not in columns:
                 valid = False
                 break
+        # name_column may be a string or dict
+        if isinstance(name_column_meta, dict):
+            names_from_dict = _normalize_columns_spec(name_column_meta)
+            name_column_meta = names_from_dict[0] if names_from_dict else None
         if name_column_meta is not None and name_column_meta not in columns:
             valid = False
         if not id_columns_meta and name_column_meta is None:
@@ -265,8 +304,42 @@ def narrow_to_single_column_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         result = result.rename(columns=value_renames)
     for col in selected_cols:
         if result[col].dtype == "object":
-            result[col] = result[col].map(
+            result.loc[:, col] = result[col].map(
                 lambda v: v.strip() if isinstance(v, str) else v
             )
+
+    # Remove rows where all selected columns (ID/name/values)
+    # have no entry (NaN or empty string).
+    if selected_cols:
+        empty_mask = pd.DataFrame(index=result.index)
+        for col in selected_cols:
+            col_series = result[col]
+            if col_series.dtype == "object":
+                empty_col = col_series.isna() | (col_series == "")
+            else:
+                empty_col = col_series.isna()
+            empty_mask[col] = empty_col
+        all_empty = empty_mask.all(axis=1)
+        if all_empty.any():
+            result = result.loc[~all_empty].copy()
+
+    # Store the original column indices (based on the original
+    # DataFrame before selection) so they can be used as keys in meta.yaml.
+    all_columns = list(dataframe.columns)
+    id_indices: list[int] = []
+    for col in id_columns:
+        if col in all_columns:
+            id_indices.append(all_columns.index(col))
+    name_index: int | None = None
+    if name_column is not None and name_column in all_columns:
+        name_index = all_columns.index(name_column)
+    value_indices: list[int] = []
+    for col in value_columns:
+        if col in all_columns:
+            value_indices.append(all_columns.index(col))
+
+    set_id_column_indices(id_indices)
+    set_name_column_index(name_index)
+    set_value_column_indices(value_indices)
 
     return result

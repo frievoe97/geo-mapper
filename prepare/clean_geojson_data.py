@@ -22,7 +22,7 @@ CONSTANTS_PATH = ROOT_DIR / "geo_mapper" / "pipeline" / "constants.py"
 def _load_constants_module():
     spec = importlib.util.spec_from_file_location("pipeline.constants", CONSTANTS_PATH)
     if spec is None or spec.loader is None:
-        raise ImportError(f"pipeline.constants konnte nicht unter {CONSTANTS_PATH} geladen werden")
+        raise ImportError(f"pipeline.constants could not be loaded from {CONSTANTS_PATH}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -30,12 +30,12 @@ def _load_constants_module():
 
 constants = _load_constants_module()
 GEODATA_RAW_ROOT = constants.GEODATA_RAW_ROOT
-GEODATA_CLEAN_ROOT = constants.GEODATA_CLEAN_ROOT
+# GEODATA_CLEAN_ROOT = constants.GEODATA_CLEAN_ROOT
 GEOJSON_ROOT = constants.GEOJSON_ROOT
 GEODATA_CSV_ROOT = constants.GEODATA_CSV_ROOT
 
 BASE_IN = GEODATA_RAW_ROOT
-BASE_OUT = GEODATA_CLEAN_ROOT
+# BASE_OUT = GEODATA_CLEAN_ROOT
 GEO_OUT = GEOJSON_ROOT
 CSV_OUT = GEODATA_CSV_ROOT
 logger = logging.getLogger(__name__)
@@ -98,10 +98,6 @@ def keep_props(props, mapping):
             out[target_key] = v
     return out
 
-
-
-def _is_point_like(c):
-    return isinstance(c, (list, tuple)) and len(c) >= 2 and isinstance(c[0], (int, float)) or (len(c)>=2 and _is_number_like(c[0]) and _is_number_like(c[1]))
 
 def _is_number_like(x):
     try:

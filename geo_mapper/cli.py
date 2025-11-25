@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import sys
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import yaml
 
 from geo_mapper.pipeline import (
     load_data_step,
@@ -60,12 +60,12 @@ def parse_args() -> argparse.Namespace:
         help="Path to a CSV (.csv) or Excel (.xlsx/.xlsm) file to load.",
     )
     parser.add_argument(
-        "--json",
-        "-j",
-        dest="json_file",
+        "--yaml",
+        "-y",
+        dest="meta_file",
         type=Path,
         required=False,
-        help="Optional path to a JSON file that will be copied into the export folder.",
+        help="Optional path to a YAML meta file that will be copied into the export folder.",
     )
     parser.add_argument(
         "--auto-mappers",
@@ -107,17 +107,18 @@ def main() -> None:
     # Basic logging setup so users see progress and warnings on the console
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     args = parse_args()
-    # Store optional JSON metadata path in central storage so export/meta helpers can use it.
-    # If provided, try to load a meta configuration dictionary from the JSON file.
-    set_json_path(args.json_file)
-    if args.json_file is not None:
+    # Store optional metadata path in central storage so export/meta helpers can use it.
+    # If provided, try to load a meta configuration dictionary from the YAML file.
+    set_json_path(args.meta_file)
+    if args.meta_file is not None:
+        meta: Any = None
         try:
-            with args.json_file.open("r", encoding="utf-8") as f:
-                meta = json.load(f)
-        except (OSError, json.JSONDecodeError) as exc:
+            with args.meta_file.open("r", encoding="utf-8") as f:
+                meta = yaml.safe_load(f)
+        except (OSError, yaml.YAMLError) as exc:
             logging.warning(
-                "JSON metadata file %s could not be read: %s",
-                args.json_file,
+                "YAML metadata file %s could not be read: %s",
+                args.meta_file,
                 exc,
             )
             set_meta_config(None)
@@ -126,8 +127,8 @@ def main() -> None:
                 set_meta_config(meta)
             else:
                 logging.warning(
-                    "JSON metadata file %s does not contain a JSON object; ignoring it.",
-                    args.json_file,
+                    "YAML metadata file %s does not contain a mapping/object; ignoring it.",
+                    args.meta_file,
                 )
                 set_meta_config(None)
     else:

@@ -1,8 +1,6 @@
 """Final step: export CSV results for the selected geodata source."""
 
 from __future__ import annotations
-
-import json
 import logging
 import re
 import shutil
@@ -98,7 +96,7 @@ def _write_mapped_pairs(
     base_dir: Path,
     dataframe: pd.DataFrame,
     selected_sources: Set[str],
-    id_col: str | None,
+    id_cols: list[str],
     name_col: str | None,
     value_cols: list[str],
 ) -> Path:
@@ -136,6 +134,11 @@ def _write_mapped_pairs(
             if export_col not in active_extra_cols:
                 active_extra_cols.append(export_col)
 
+    # Prepare ID-Feldnamen (mehrere ID-Spalten werden durchnummeriert exportiert).
+    id_field_names: list[str] = []
+    if id_cols:
+        id_field_names = [f"original_id_{i}" for i in range(1, len(id_cols) + 1)]
+
     for source_path, mapping_df in mappings_by_source.items():
         if source_path not in effective_sources:
             continue
@@ -145,16 +148,22 @@ def _write_mapped_pairs(
         if not mask.any():
             continue
         # For each mapped row in this CSV:
-        # write original ID/name (if present), value columns, and geodata ID/name
+        # write original IDs/Namen (if present), value columns, and geodata ID/name
         for idx in mapping_df.index[mask]:
-            original_id = dataframe.loc[idx, id_col] if id_col and id_col in dataframe.columns else pd.NA
             original_name = dataframe.loc[idx, name_col] if name_col and name_col in dataframe.columns else pd.NA
             geodata_id = mapping_df.loc[idx, "mapped_value"]
-            row: dict[str, object] = {
-                "original_id": original_id,
-                "original_name": original_name,
-                "geodata_name": mapping_df.loc[idx, "mapped_label"],
-            }
+            row: dict[str, object] = {}
+
+            # Mehrere ID-Spalten exportieren: original_id_1, original_id_2, ...
+            if id_cols:
+                for field_name, col in zip(id_field_names, id_cols, strict=False):
+                    if col in dataframe.columns:
+                        row[field_name] = dataframe.loc[idx, col]
+                    else:
+                        row[field_name] = pd.NA
+
+            row["original_name"] = original_name
+            row["geodata_name"] = mapping_df.loc[idx, "mapped_label"]
             extra_ids = _collect_geodata_id_values(
                 source_path,
                 geodata_id,
@@ -176,30 +185,43 @@ def _write_mapped_pairs(
             rows.append(row)
 
     if rows:
-        base_cols = [
-            "original_id",
-            "original_name",
-            "geodata_name",
-            *active_extra_cols,
-            "mapper",
-            "parameter",
-        ]
+        base_cols: list[str] = []
+        # Erst die ID-Spalten (durchnummeriert, falls vorhanden)
+        if id_cols:
+            base_cols.extend(id_field_names)
+
+        base_cols.extend(
+            [
+                "original_name",
+                "geodata_name",
+                *active_extra_cols,
+                "mapper",
+                "parameter",
+            ]
+        )
         filtered_value_cols = [c for c in value_cols if c not in base_cols]
         export_cols = base_cols + filtered_value_cols
         out_df = pd.DataFrame(rows, columns=export_cols)
         # Mapper order in the export mirrors DEFAULT_MAPPERS.
         mapper_priority = MAPPER_PRIORITY
-        out_df["_mapper_order"] = out_df["mapper"].map(mapper_priority).fillna(len(mapper_priority))
+        mapper_order = out_df["mapper"].map(mapper_priority)
+        mapper_order = mapper_order.fillna(len(mapper_priority))
+        out_df.loc[:, "_mapper_order"] = mapper_order
         out_df = out_df.sort_values("_mapper_order", kind="stable").drop(columns=["_mapper_order"])
     else:
-        base_cols = [
-            "original_id",
-            "original_name",
-            "geodata_name",
-            *active_extra_cols,
-            "mapper",
-            "parameter",
-        ]
+        base_cols = []
+        if id_cols:
+            base_cols.extend(id_field_names)
+
+        base_cols.extend(
+            [
+                "original_name",
+                "geodata_name",
+                *active_extra_cols,
+                "mapper",
+                "parameter",
+            ]
+        )
         filtered_value_cols = [c for c in value_cols if c not in base_cols]
         export_cols = base_cols + filtered_value_cols
         out_df = pd.DataFrame(columns=export_cols)
@@ -212,7 +234,7 @@ def _write_unmapped_original(
     base_dir: Path,
     dataframe: pd.DataFrame,
     selected_sources: Set[str],
-    id_col: str | None,
+    id_cols: list[str],
     name_col: str | None,
 ) -> Path:
     """Write CSV with original ID/name values that were not mapped by any selected CSV."""
@@ -237,28 +259,38 @@ def _write_unmapped_original(
     # Build the list of unmapped original rows explicitly so that index
     # alignment cannot accidentally change exported values.
     rows: list[dict[str, object]] = []
+
+    id_field_names: list[str] = []
+    if id_cols:
+        id_field_names = [f"original_id_{i}" for i in range(1, len(id_cols) + 1)]
     for idx in dataframe.index:
         if idx in mapped_indices:
             continue
-        if id_col and id_col in dataframe.columns:
-            original_id = dataframe.at[idx, id_col]
-        else:
-            original_id = pd.NA
+        row: dict[str, object] = {}
+
+        if id_cols:
+            for field_name, col in zip(id_field_names, id_cols, strict=False):
+                if col in dataframe.columns:
+                    row[field_name] = dataframe.at[idx, col]
+                else:
+                    row[field_name] = pd.NA
+
         if name_col and name_col in dataframe.columns:
             original_name = dataframe.at[idx, name_col]
         else:
             original_name = pd.NA
-        rows.append(
-            {
-                "original_id": original_id,
-                "original_name": original_name,
-            }
-        )
+        row["original_name"] = original_name
+        rows.append(row)
+
+    base_cols: list[str] = []
+    if id_cols:
+        base_cols.extend(id_field_names)
+    base_cols.append("original_name")
 
     if rows:
-        out_df = pd.DataFrame(rows, columns=["original_id", "original_name"])
+        out_df = pd.DataFrame(rows, columns=base_cols)
     else:
-        out_df = pd.DataFrame(columns=["original_id", "original_name"])
+        out_df = pd.DataFrame(columns=base_cols)
     out_path = base_dir / "unmapped_orginal.csv"
     out_df.to_csv(out_path, index=False)
     return out_path
@@ -285,30 +317,55 @@ def _write_unmapped_geodata(
             used_ids_by_source[str(source_path)] = ids
 
     geodata_frames = get_geodata_frames()
-    rows: List[dict[str, str]] = []
+    rows: List[dict[str, object]] = []
     consider_all = not selected_sources
 
     for path, frame in geodata_frames:
         source_path = str(path)
         if not consider_all and source_path not in selected_sources:
             continue
-        if not {"id", "name"}.issubset(frame.columns):
+        if "name" not in frame.columns:
             continue
+        dataset_family = infer_dataset_family(path) or ""
+        id_mappings = GEODATA_ID_COLUMNS.get(dataset_family, [])
         used_ids = used_ids_by_source.get(source_path, set())
-        for gid, name in zip(frame["id"], frame["name"], strict=False):
+        # Fallback: use canonical 'id' column for used/unused detection
+        if "id" not in frame.columns:
+            continue
+        for idx, gid in frame["id"].items():
             if pd.isna(gid):
                 continue
             gid_str = str(gid)
             if gid_str in used_ids:
                 continue
-            rows.append(
-                {
-                    "geodata_id": gid_str,
-                    "geodata_name": str(name),
-                }
-            )
+            row: dict[str, object] = {}
+            # Export dataset-specific ID columns
+            for src_col, export_col in id_mappings:
+                if src_col in frame.columns:
+                    val = frame.at[idx, src_col]
+                else:
+                    val = None
+                key = _stringify_geodata_id_value(val)
+                row[export_col] = key if key is not None else pd.NA
+            # Export name column
+            name_val = frame.at[idx, "name"]
+            row["geodata_name"] = str(name_val)
+            rows.append(row)
 
-    out_df = pd.DataFrame(rows, columns=["geodata_id", "geodata_name"])
+    # Determine all potential export ID columns (for a consistent column order)
+    export_id_cols: list[str] = []
+    for mapping_list in GEODATA_ID_COLUMNS.values():
+        for _src_col, export_col in mapping_list:
+            if export_col not in export_id_cols:
+                export_id_cols.append(export_col)
+
+    base_cols = [col for col in export_id_cols if any(col in r for r in rows)]
+    base_cols.append("geodata_name")
+
+    if rows:
+        out_df = pd.DataFrame(rows, columns=base_cols)
+    else:
+        out_df = pd.DataFrame(columns=base_cols)
     out_path = base_dir / "unmapped_geodata.csv"
     out_df.to_csv(out_path, index=False)
     return out_path
@@ -365,11 +422,12 @@ def _write_meta_json(
     base_dir: Path,
     parsed_level: str | None,
     parsed_year: str | None,
+    dataframe: pd.DataFrame,
 ) -> Path | None:
-    """Write a meta.json with column/level/year info based on selections.
+    """Write a meta.yaml with column/level/year info based on selections.
 
-    - Start from any existing meta_config (from an input JSON, if provided)
-    - Fill/fix fields: id_column, id_columns, name_column, value_columns, geodata_level, geodata_year
+    - Start from any existing meta_config (from an input YAML, if provided)
+    - Fill/fix fields: id_columns, name_column, value_columns, geodata_level, geodata_year
     - Never modify the original input JSON file; this only writes into the export folder.
     """
     selections = get_selections()
@@ -378,17 +436,100 @@ def _write_meta_json(
         meta = {}
 
     # Columns
-    if "id_column" not in meta:
-        meta["id_column"] = selections.id_column
+    # id_columns als Dict: {\"<original_index>\": \"id_col_name\", ...}
     if "id_columns" not in meta:
-        meta["id_columns"] = getattr(selections, "id_columns", []) or (
+        id_cols = getattr(selections, "id_columns", None) or (
             [selections.id_column] if selections.id_column else []
         )
+        id_indices = getattr(selections, "id_column_indices", None) or []
+        if id_indices and len(id_indices) == len(id_cols):
+            meta["id_columns"] = {
+                str(idx): col for idx, col in zip(id_indices, id_cols, strict=False)
+            }
+        else:
+            # Fallback: durchnummerieren, falls keine Indizes vorliegen
+            meta["id_columns"] = {str(i): col for i, col in enumerate(id_cols)}
+    # name_column als Dict mit Index und Name (falls vorhanden)
     if "name_column" not in meta:
-        meta["name_column"] = selections.name_column
+        if selections.name_column is not None:
+            name_index = getattr(selections, "name_column_index", None)
+            key = str(name_index) if isinstance(name_index, int) else "0"
+            meta["name_column"] = {key: selections.name_column}
+        else:
+            meta["name_column"] = {}
+    # value_columns als Dict: {\"<original_index>\": \"value_col_name\", ...}
     if "value_columns" not in meta:
         value_cols = getattr(selections, "value_columns", None) or []
-        meta["value_columns"] = list(value_cols)
+        value_indices = getattr(selections, "value_column_indices", None) or []
+        if value_indices and len(value_indices) == len(value_cols):
+            meta["value_columns"] = {
+                str(idx): col for idx, col in zip(value_indices, value_cols, strict=False)
+            }
+        else:
+            meta["value_columns"] = {str(i): col for i, col in enumerate(value_cols)}
+
+    # Worksheet (Excel sheet name), falls vorhanden
+    if "worksheet" not in meta:
+        worksheet = getattr(selections, "worksheet_name", None)
+        if worksheet:
+            meta["worksheet"] = worksheet
+
+    # Manual mappings: IDs/Names from input and geodata for rows mapped manually
+    if "manual_mappings" not in meta:
+        manual_entries: list[dict[str, object]] = []
+        from .storage import get_geodata_mappings, get_export_geodata_source
+        mappings_by_source = get_geodata_mappings()
+        export_source = get_export_geodata_source()
+        mapping_df = mappings_by_source.get(export_source or "")
+        if mapping_df is not None and "mapped_by" in mapping_df.columns:
+            try:
+                manual_mask = mapping_df["mapped_by"] == "manual"
+            except Exception:
+                manual_mask = None
+            if manual_mask is not None and manual_mask.any():
+                id_cols = getattr(selections, "id_columns", None) or (
+                    [selections.id_column] if selections.id_column else []
+                )
+                name_col = (
+                    selections.name_column
+                    or selections.column
+                    or (dataframe.columns[0] if len(dataframe.columns) else None)
+                )
+                for idx in mapping_df.index[manual_mask]:
+                    entry: dict[str, object] = {}
+                    # Input IDs als Dict {"0": id_1, "1": id_2, ...}
+                    input_ids: dict[str, object] = {}
+                    for i, col in enumerate(id_cols):
+                        if col in dataframe.columns:
+                            val = dataframe.loc[idx, col]
+                        else:
+                            val = None
+                        if val is None or (isinstance(val, float) and pd.isna(val)):
+                            input_ids[str(i)] = None
+                        else:
+                            input_ids[str(i)] = val
+                    entry["input_ids"] = input_ids
+                    # Input-Name
+                    input_name = None
+                    if name_col and name_col in dataframe.columns:
+                        val = dataframe.loc[idx, name_col]
+                        if not (isinstance(val, float) and pd.isna(val)):
+                            input_name = val
+                    entry["input_name"] = input_name
+                    # Geodaten-ID/-Name
+                    geodata_id = mapping_df.loc[idx, "mapped_value"] if "mapped_value" in mapping_df.columns else None
+                    if geodata_id is None or (isinstance(geodata_id, float) and pd.isna(geodata_id)):
+                        entry["geodata_id"] = None
+                    else:
+                        entry["geodata_id"] = geodata_id
+                    geodata_name = mapping_df.loc[idx, "mapped_label"] if "mapped_label" in mapping_df.columns else None
+                    if geodata_name is None or (isinstance(geodata_name, float) and pd.isna(geodata_name)):
+                        entry["geodata_name"] = None
+                    else:
+                        entry["geodata_name"] = geodata_name
+                    manual_entries.append(entry)
+        if manual_entries:
+            meta["manual_mappings"] = manual_entries
 
     # Level (administrative level) -> geodata_level
     if "geodata_level" not in meta:
@@ -419,12 +560,14 @@ def _write_meta_json(
         meta["geodata_year"] = year_value
 
     try:
+        import yaml
+
         base_dir.mkdir(parents=True, exist_ok=True)
-        out_path = base_dir / "meta.json"
+        out_path = base_dir / "meta.yaml"
         with out_path.open("w", encoding="utf-8") as f:
-            json.dump(meta, f, ensure_ascii=False, indent=2)
+            yaml.safe_dump(meta, f, allow_unicode=True, sort_keys=False)
     except OSError as exc:
-        logger.warning("Could not write meta.json: %s", exc)
+        logger.warning("Could not write meta.yaml: %s", exc)
         return None
 
     logger.info("Wrote meta-information to %s.", out_path)
@@ -443,7 +586,9 @@ def export_results_step(dataframe: pd.DataFrame) -> pd.DataFrame:
     selected_sources: Set[str] = {selected_source}
 
     selections = get_selections()
-    id_col = selections.id_column
+    id_cols = getattr(selections, "id_columns", None) or (
+        [selections.id_column] if selections.id_column else []
+    )
     name_col = (
         selections.name_column
         or selections.column
@@ -489,7 +634,7 @@ def export_results_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         base_dir,
         dataframe,
         selected_sources,
-        id_col,
+        id_cols,
         name_col,
         value_cols,
     )
@@ -497,11 +642,11 @@ def export_results_step(dataframe: pd.DataFrame) -> pd.DataFrame:
         base_dir,
         dataframe,
         selected_sources,
-        id_col,
+        id_cols,
         name_col,
     )
     unmapped_geodata_path = _write_unmapped_geodata(base_dir, selected_sources)
-    _write_meta_json(base_dir, parsed_level, parsed_year)
+    _write_meta_json(base_dir, parsed_level, parsed_year, dataframe)
     _export_selected_geodata_files(base_dir, selected_source)
 
     logger.info("Exported mapped pairs to: %s", mapped_path)
