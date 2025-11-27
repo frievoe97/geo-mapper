@@ -37,7 +37,7 @@ def _discover_cases() -> list[tuple[str, Path, Path, Path]]:
             ]
             if not input_files:
                 continue
-            # Jede Test-Variante sollte genau eine Eingabedatei haben.
+            # Each test variant should have exactly one input file.
             assert (
                 len(input_files) == 1
             ), f"Expected exactly one input file in {variant_dir}, found: {input_files}"

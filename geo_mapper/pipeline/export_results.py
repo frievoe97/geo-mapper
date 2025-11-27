@@ -155,7 +155,7 @@ def _write_mapped_pairs(
             geodata_id = mapping_df.loc[idx, "mapped_value"]
             row: dict[str, object] = {}
 
-            # Mehrere ID-Spalten exportieren: original_id_1, original_id_2, ...
+            # Export multiple ID columns: original_id_1, original_id_2, ...
             if id_cols:
                 for field_name, col in zip(id_field_names, id_cols, strict=False):
                     if col in dataframe.columns:

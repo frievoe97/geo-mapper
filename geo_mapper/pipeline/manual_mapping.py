@@ -257,7 +257,7 @@ def _manual_mapping_curses_loop(
 
         geo_rows: List[Tuple[str, str, str]] = []
         if raw_geo_rows:
-            # Sort nach Name (letzte Spalte)
+            # Sort by name (last column)
             raw_geo_rows.sort(key=lambda pair: pair[1][-1].casefold())
             for geo_id_str, cols in raw_geo_rows:
                 display = " | ".join(cols)
