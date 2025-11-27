@@ -1,0 +1,84 @@
+id_columns: {}
+name_column:
+  '1': Gemeindename
+value_columns: {}
+worksheet: Deutschlandatlas_GEM1223
+manual_mappings:
+- input_ids: {}
+  input_name: Byhleguhre-Byhlen/Bela Góra-Belin
+  geodata_id: '12061061'
+  geodata_name: Byhleguhre-Byhlen/Beła Góra-Bělin
+- input_ids: {}
+  input_name: Lübben (Spreewald) / Lubin (Blota), Stadt
+  geodata_id: '12061316'
+  geodata_name: Lübben (Spreewald) / Lubin (Błota), Stadt
+- input_ids: {}
+  input_name: Schlepzig/Slopišca
+  geodata_id: '12061428'
+  geodata_name: Schlepzig/Słopišća
+- input_ids: {}
+  input_name: Spreewaldheide/Blosanska Góla
+  geodata_id: '12061470'
+  geodata_name: Spreewaldheide/Błośańska Góla
+- input_ids: {}
+  input_name: Straupitz (Spreewald)/Tšupc (Blota)
+  geodata_id: '12061476'
+  geodata_name: Straupitz (Spreewald)/Tšupc (Błota)
+- input_ids: {}
+  input_name: Lübbenau/Spreewald / Lubnjow/Blota, Stadt
+  geodata_id: '12066196'
+  geodata_name: Lübbenau/Spreewald / Lubnjow/Błota, Stadt
+- input_ids: {}
+  input_name: Senftenberg/Zly Komorow, Stadt
+  geodata_id: '12066304'
+  geodata_name: Senftenberg/Zły Komorow, Stadt
+- input_ids: {}
+  input_name: Vetschau/Spreewald / Wetošow/Blota, Stadt
+  geodata_id: '12066320'
+  geodata_name: Vetschau/Spreewald / Wětošow/Błota, Stadt
+- input_ids: {}
+  input_name: Burg (Spreewald)/Bórkowy (Blota)
+  geodata_id: '12071032'
+  geodata_name: Burg (Spreewald)/Bórkowy (Błota)
+- input_ids: {}
+  input_name: Forst (Lausitz)/Baršc (Lužyca), Stadt
+  geodata_id: '12071076'
+  geodata_name: Forst (Lausitz)/Baršć (Łužyca), Stadt
+- input_ids: {}
+  input_name: Kolkwitz/Golkojce
+  geodata_id: '12071244'
+  geodata_name: Kolkwitz/Gołkojce
+- input_ids: {}
+  input_name: Neiße-Malxetal/Dolina Nysa-Malksa
+  geodata_id: '12071294'
+  geodata_name: Neiße-Malxetal/Dolina Nysa-Małksa
+- input_ids: {}
+  input_name: Turnow-Preilack/Turnow-Psiluk
+  geodata_id: '12071401'
+  geodata_name: Turnow-Preilack/Turnow-Pśiłuk
+- input_ids: {}
+  input_name: Wiesengrund/Lukojce
+  geodata_id: '12071414'
+  geodata_name: Wiesengrund/Łukojce
+- input_ids: {}
+  input_name: Lohsa / Laz
+  geodata_id: '14625330'
+  geodata_name: Lohsa / Łaz
+- input_ids: {}
+  input_name: Neschwitz / Njeswacidlo
+  geodata_id: '14625360'
+  geodata_name: Neschwitz / Njeswačidło
+- input_ids: {}
+  input_name: Spreetal / Sprjewiny Dol
+  geodata_id: '14625570'
+  geodata_name: Spreetal / Sprjewiny Doł
+- input_ids: {}
+  input_name: Gablenz / Jablonc
+  geodata_id: '14626100'
+  geodata_name: Gablenz / Jabłońc
+- input_ids: {}
+  input_name: Weißwasser/O.L., Stadt / Bela Woda
+  geodata_id: '14626600'
+  geodata_name: Weißwasser/O.L., Stadt / Běła Woda
+geodata_level: LAU
+geodata_year: '2024'

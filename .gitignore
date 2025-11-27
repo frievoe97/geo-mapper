@@ -4,6 +4,9 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Local scratch files
+/test.py
+
 # Virtual environments
 .venv/
 venv/

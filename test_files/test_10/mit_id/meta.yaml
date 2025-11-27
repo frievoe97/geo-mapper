@@ -1,0 +1,9 @@
+id_columns:
+  '1': 'Unnamed: 1'
+  '2': 'Unnamed: 2'
+name_column:
+  '7': 'Unnamed: 7'
+value_columns: {}
+worksheet: '2.1'
+geodata_level: NUTS 3
+geodata_year: '2024'

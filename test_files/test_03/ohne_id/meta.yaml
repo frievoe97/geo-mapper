@@ -1,0 +1,32 @@
+id_columns: {}
+name_column:
+  '1': 'Unnamed: 1'
+value_columns: {}
+worksheet: 22543-01-01-4
+manual_mappings:
+- input_ids: {}
+  input_name: Heidekreis
+  geodata_id: DE938
+  geodata_name: Soltau-Fallingbostel
+- input_ids: {}
+  input_name: Rhein-Kreis Neuss
+  geodata_id: DEA1D
+  geodata_name: Neuss
+- input_ids: {}
+  input_name: Rhein-Erft-Kreis
+  geodata_id: DEA27
+  geodata_name: Erftkreis
+- input_ids: {}
+  input_name: Vulkaneifel, Landkreis
+  geodata_id: DEB24
+  geodata_name: Daun
+- input_ids: {}
+  input_name: Rhein-Pfalz-Kreis
+  geodata_id: DEB3I
+  geodata_name: Ludwigshafen, Landkreis
+- input_ids: {}
+  input_name: Saarbrücken, Regionalverband
+  geodata_id: DEC01
+  geodata_name: Stadtverband Saarbrücken
+geodata_level: NUTS 3
+geodata_year: '2003'

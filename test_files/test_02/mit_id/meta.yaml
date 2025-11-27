@@ -1,0 +1,8 @@
+id_columns:
+  '0': 'Gebietsfläche: Kreise, Stichtag'
+name_column:
+  '1': 'Unnamed: 1'
+value_columns: {}
+worksheet: 11111-0002
+geodata_level: NUTS 3
+geodata_year: '2024'

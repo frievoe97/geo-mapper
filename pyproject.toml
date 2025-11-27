@@ -31,6 +31,16 @@ dependencies = [
     "pyyaml==6.0.2",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4,<9",
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:Workbook contains no default style, apply openpyxl's default:UserWarning",
+]
+
 [project.urls]
 Homepage = "https://friedrichvoelkers.de"
 Repository = "https://github.com/frievoe97/geo-mapper"

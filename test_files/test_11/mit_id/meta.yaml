@@ -1,0 +1,7 @@
+id_columns:
+  '1': id
+name_column:
+  '0': name
+value_columns: {}
+geodata_level: NUTS 3
+geodata_year: '2024'

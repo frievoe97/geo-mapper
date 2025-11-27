@@ -1,0 +1,7 @@
+id_columns:
+  '0': 'Unnamed: 0'
+name_column:
+  '1': Bevölkerungsdichte (EW je qkm)
+value_columns: {}
+geodata_level: NUTS 3
+geodata_year: '2024'

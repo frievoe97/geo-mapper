@@ -1,0 +1,8 @@
+id_columns:
+  '1': 'Unnamed: 1'
+name_column:
+  '2': 'Unnamed: 2'
+value_columns: {}
+worksheet: Kennzahlen Kreise
+geodata_level: NUTS 3
+geodata_year: '2010'

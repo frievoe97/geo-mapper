@@ -180,8 +180,8 @@ Verfügbare Optionen:
   Legt fest, ob und in welcher Form die ausgewählte Geodatenquelle zusätzlich in den Ergebnisordner exportiert wird.  
   - `no`: kein Geodaten-Export.  
   - `csv`: die zugrunde liegende Geodaten-CSV wird mitgeschrieben.  
-  - `geojson`: die passende GeoJSON-Datei wird mitgeschrieben.  
-  - `both`: sowohl CSV als auch GeoJSON werden exportiert.
+  - `geojson`: es wird eine `.txt`-Datei mit dem Link zur passenden GeoJSON-Datei geschrieben.  
+  - `both`: CSV sowie eine `.txt`-Datei mit dem GeoJSON-Link werden exportiert.
 
 Boolesche Flags (`--auto-mappers`, `--auto-export-source`) akzeptieren typische Angaben wie `true`, `false`, `1`, `0`, `yes`, `no` (ohne Beachtung von Groß-/Kleinschreibung).
 

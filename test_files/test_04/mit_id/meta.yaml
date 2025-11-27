@@ -1,0 +1,8 @@
+id_columns:
+  '1': ID
+name_column:
+  '2': Name
+value_columns: {}
+worksheet: Tabelle1
+geodata_level: NUTS 3
+geodata_year: '2024'

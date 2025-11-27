@@ -25,6 +25,7 @@ from .constants import (
     infer_dataset_family,
     GEODATA_CSV_ROOT,
     GEOJSON_ROOT,
+    PACKAGE_ROOT,
 )
 
 
@@ -409,11 +410,25 @@ def _export_selected_geodata_files(base_dir: Path, selected_source: str) -> None
             )
             return
 
-        geojson_dst = base_dir / geojson_src.name
+        try:
+            rel_repo_path = geojson_src.resolve().relative_to(PACKAGE_ROOT.parent.resolve())
+        except ValueError as exc:
+            logger.warning(
+                "Could not build GitHub URL for GeoJSON %s: %s",
+                geojson_src,
+                exc,
+            )
+            return
+
+        geojson_url = (
+            "https://github.com/frievoe97/geo-mapper/raw/refs/heads/main/"
+            + rel_repo_path.as_posix()
+        )
+        txt_dst = base_dir / f"{geojson_src.stem}.txt"
         try:
             base_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(geojson_src, geojson_dst)
-            logger.info("Exported geodata GeoJSON to: %s", geojson_dst)
+            txt_dst.write_text(geojson_url + "\n", encoding="utf-8")
+            logger.info("Exported geodata GeoJSON link to: %s", txt_dst)
         except OSError as exc:
             logger.warning("Could not export geodata GeoJSON %s: %s", geojson_src, exc)
 

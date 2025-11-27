@@ -1,0 +1,16 @@
+id_columns: {}
+name_column:
+  '2': 'Unnamed: 2'
+value_columns: {}
+worksheet: Kennzahlen Kreise
+manual_mappings:
+- input_ids: {}
+  input_name: Vulkaneifel
+  geodata_id: DEB24
+  geodata_name: Daun
+- input_ids: {}
+  input_name: Neustadt a.d.Aisch-Bad Windsh.
+  geodata_id: DE25A
+  geodata_name: Neustadt a. d. Aisch-Bad Windsheim
+geodata_level: NUTS 3
+geodata_year: '2010'

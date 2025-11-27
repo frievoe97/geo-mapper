@@ -1,0 +1,8 @@
+id_columns:
+  '0': GKZ1223
+name_column:
+  '1': Gemeindename
+value_columns: {}
+worksheet: Deutschlandatlas_GEM1223
+geodata_level: LAU
+geodata_year: '2024'
