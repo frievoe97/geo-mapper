@@ -9,7 +9,7 @@ from geo_mapper.pipeline.storage import set_geodata_frames, set_meta_config, set
 
 
 def test_apply_meta_manual_mappings_applies_entries_once() -> None:
-    # Einfaches Input-DataFrame mit Name-Spalte.
+    # Simple input DataFrame with a name column.
     dataframe = pd.DataFrame({"name": ["A", "B", "C"]})
     geodata_frame = pd.DataFrame({"id": ["G1", "G2"], "name": ["Geo1", "Geo2"]})
     source_path = "/tmp/NUTS_3/2024/file.csv"
@@ -48,7 +48,7 @@ def test_apply_meta_manual_mappings_applies_entries_once() -> None:
         source_path=source_path,
     )
 
-    # Nur Zeile mit Name "B" wird gemappt, einmalig.
+    # Only the row with name "B" is mapped, exactly once.
     assert mapping_df.loc[1, "mapped_value"] == "G2"
     assert mapping_df.loc[1, "mapped_label"] == "Geo2"
     assert mapping_df.loc[1, "mapped_by"] == "manual"

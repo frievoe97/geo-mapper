@@ -40,14 +40,13 @@ def _collect_geodata_index(
 ]:
     """Build indexes for normalized names **within a single geodata dataset**.
 
-    The mapper is designed to work per Geodaten-CSV. An Eingabewert kann
-    deshalb in mehreren Jahrgängen/Versionen gemappt werden, weil jede CSV
-    separat analysiert wird. Entscheidend ist nur die Eindeutigkeit innerhalb
-    eines einzelnen Datensatzes.
+    The mapper is designed to work per geodata CSV. A single input value can
+    therefore be mapped in several years/versions, because each CSV is
+    analyzed separately. Only uniqueness within a single dataset matters.
 
     Returns:
     - name_counts: Counter of occurrences per normalized name in this dataset
-    - unique_map_by_name: names that map eindeutig auf genau eine Geodaten-ID
+    - unique_map_by_name: names that map clearly to exactly one geodata ID
     - hits_by_name: mapping to all hits (id, csv_path, original_name) for diagnostics
     - label_by_name: for unique names, their original geodata label
     - frames_indexed: always 1 for this per-dataset variant
@@ -73,9 +72,8 @@ def _collect_geodata_index(
     unique_map_by_name: Dict[str, Tuple[str, Path]] = {}
     label_by_name: Dict[str, str] = {}
 
-    # Eindeutig ist ein Name genau dann, wenn er in diesem Datensatz
-    # nur auf eine einzige Geodaten-ID zeigt – unabhängig davon, wie
-    # viele Zeilen diese ID tragen.
+    # A name is unique in this dataset if it points to exactly one geodata ID,
+    # regardless of how many rows carry that ID.
     for n, triples in hits_by_name.items():
         ids = {t[0] for t in triples}
         if len(ids) == 1:
@@ -105,8 +103,8 @@ def _collect_geodata_index(
 def unique_name_mapper(
     df_slice: pd.DataFrame, geodata_frames: List[Tuple[Path, pd.DataFrame]], source_col: str
 ) -> pd.DataFrame:
-    """Map rows where the source value points eindeutig auf eine Geodaten-ID
-    innerhalb des übergebenen Geodaten-Datensatzes.
+    """Map rows where the source value points uniquely to a geodata ID
+    within the given geodata dataset.
 
     Returns a DataFrame containing 'mapped_by', 'mapped_value' and 'mapped_source'
     with the same index as `df_slice`.

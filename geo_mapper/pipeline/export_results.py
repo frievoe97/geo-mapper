@@ -135,7 +135,7 @@ def _write_mapped_pairs(
             if export_col not in active_extra_cols:
                 active_extra_cols.append(export_col)
 
-    # Prepare ID-Feldnamen (mehrere ID-Spalten werden durchnummeriert exportiert).
+    # Prepare ID field names (multiple ID columns are numbered in the export).
     id_field_names: list[str] = []
     if id_cols:
         id_field_names = [f"original_id_{i}" for i in range(1, len(id_cols) + 1)]
@@ -187,7 +187,7 @@ def _write_mapped_pairs(
 
     if rows:
         base_cols: list[str] = []
-        # Erst die ID-Spalten (durchnummeriert, falls vorhanden)
+        # First the ID columns (numbered if present)
         if id_cols:
             base_cols.extend(id_field_names)
 
@@ -451,7 +451,7 @@ def _write_meta_json(
         meta = {}
 
     # Columns
-    # id_columns als Dict: {\"<original_index>\": \"id_col_name\", ...}
+    # id_columns as a dict: {"<original_index>": "id_col_name", ...}
     if "id_columns" not in meta:
         id_cols = getattr(selections, "id_columns", None) or (
             [selections.id_column] if selections.id_column else []
@@ -462,9 +462,9 @@ def _write_meta_json(
                 str(idx): col for idx, col in zip(id_indices, id_cols, strict=False)
             }
         else:
-            # Fallback: durchnummerieren, falls keine Indizes vorliegen
+            # Fallback: assign running numbers if no indices are available
             meta["id_columns"] = {str(i): col for i, col in enumerate(id_cols)}
-    # name_column als Dict mit Index und Name (falls vorhanden)
+    # name_column as a dict with index and name (if present)
     if "name_column" not in meta:
         if selections.name_column is not None:
             name_index = getattr(selections, "name_column_index", None)
@@ -472,7 +472,7 @@ def _write_meta_json(
             meta["name_column"] = {key: selections.name_column}
         else:
             meta["name_column"] = {}
-    # value_columns als Dict: {\"<original_index>\": \"value_col_name\", ...}
+    # value_columns as a dict: {"<original_index>": "value_col_name", ...}
     if "value_columns" not in meta:
         value_cols = getattr(selections, "value_columns", None) or []
         value_indices = getattr(selections, "value_column_indices", None) or []
@@ -483,7 +483,7 @@ def _write_meta_json(
         else:
             meta["value_columns"] = {str(i): col for i, col in enumerate(value_cols)}
 
-    # Worksheet (Excel sheet name), falls vorhanden
+    # Worksheet (Excel sheet name), if present
     if "worksheet" not in meta:
         worksheet = getattr(selections, "worksheet_name", None)
         if worksheet:
@@ -512,7 +512,7 @@ def _write_meta_json(
                 )
                 for idx in mapping_df.index[manual_mask]:
                     entry: dict[str, object] = {}
-                    # Input IDs als Dict {"0": id_1, "1": id_2, ...}
+                    # Input IDs as a dict {"0": id_1, "1": id_2, ...}
                     input_ids: dict[str, object] = {}
                     for i, col in enumerate(id_cols):
                         if col in dataframe.columns:
@@ -524,14 +524,14 @@ def _write_meta_json(
                         else:
                             input_ids[str(i)] = val
                     entry["input_ids"] = input_ids
-                    # Input-Name
+                    # Input name
                     input_name = None
                     if name_col and name_col in dataframe.columns:
                         val = dataframe.loc[idx, name_col]
                         if not (isinstance(val, float) and pd.isna(val)):
                             input_name = val
                     entry["input_name"] = input_name
-                    # Geodaten-ID/-Name
+                    # Geodata ID/name
                     geodata_id = mapping_df.loc[idx, "mapped_value"] if "mapped_value" in mapping_df.columns else None
                     if geodata_id is None or (isinstance(geodata_id, float) and pd.isna(geodata_id)):
                         entry["geodata_id"] = None

@@ -25,10 +25,9 @@ def test_drop_completely_empty_rows_removes_only_fully_empty_rows() -> None:
 
     cleaned = _drop_completely_empty_rows(df)
 
-    # Zeile 0: a="", b=None  -> leer
-    # Zeile 1: a="  ", b="y" -> nicht leer
-    # Zeile 2: a="x", b=" "  -> nicht leer
-    # Zeile 3: a=None, b="z" -> nicht leer
+    # Row 0: a="", b=None  -> empty
+    # Row 1: a="  ", b="y" -> not empty
+    # Row 2: a="x", b=" "  -> not empty
+    # Row 3: a=None, b="z" -> not empty
     assert list(cleaned.index) == [1, 2, 3]
     assert cleaned.loc[2, "a"] == "x"
-

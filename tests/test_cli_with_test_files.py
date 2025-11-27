@@ -78,11 +78,11 @@ def test_cli_outputs_match_expected_results(
 ) -> None:
     """Run the CLI for each input/meta pair and compare CSV results."""
     # CLI: --data <input> --yaml <meta> --auto-export-source true
-    # Ergebnisse sollen identisch zu den vorberechneten CSVs sein.
+    # Results should be identical to the precomputed CSVs.
     from geo_mapper import cli
     from geo_mapper.pipeline import manual_mapping as mm  # type: ignore[attr-defined]
 
-    # Patch: interaktive Manual-Mapping-UIs deaktivieren, Meta-Mappings aber beibehalten.
+    # Patch: disable interactive manual-mapping UIs, but keep meta-based mappings.
     def _no_ui(
         dataframe,  # pd.DataFrame
         mapping_df,  # pd.DataFrame
@@ -95,7 +95,7 @@ def test_cli_outputs_match_expected_results(
     monkeypatch.setattr(mm, "_run_curses_manual_mapping", _no_ui)
     monkeypatch.setattr(mm, "_run_questionary_manual_mapping", _no_ui)
 
-    # Für jeden Fall eine eigene Arbeitskopie unter tmp_path anlegen.
+    # Create a separate working copy under tmp_path for each case.
     case_tmp_dir = tmp_path / case_id.replace("/", "_")
     case_tmp_dir.mkdir(parents=True, exist_ok=True)
 
@@ -104,7 +104,7 @@ def test_cli_outputs_match_expected_results(
     shutil.copy2(input_file, tmp_input)
     shutil.copy2(meta_file, tmp_meta)
 
-    # CLI wie vom Nutzer gewünscht aufrufen.
+    # Call the CLI as the user would.
     argv = [
         "geo-mapper",
         "--data",
@@ -117,7 +117,7 @@ def test_cli_outputs_match_expected_results(
     monkeypatch.setattr("sys.argv", argv)
     cli.main()
 
-    # Die CLI schreibt die Ergebnisse nach <input_dir>/results_<stem>.
+    # The CLI writes the results to <input_dir>/results_<stem>.
     generated_results_dir = case_tmp_dir / expected_results_dir.name
     assert generated_results_dir.is_dir(), (
         f"[{case_id}] Expected results directory {generated_results_dir} "
@@ -139,7 +139,7 @@ def test_cli_outputs_match_expected_results(
         expected_df = _load_sorted_csv(expected_path)
         generated_df = _load_sorted_csv(generated_path)
 
-        # Spalten und Werte sollen übereinstimmen (Datentypen können leicht variieren).
+        # Columns and values must match (data types may differ slightly).
         pd.testing.assert_frame_equal(
             expected_df,
             generated_df,

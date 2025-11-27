@@ -14,7 +14,7 @@ def test_stringify_geodata_id_value_normalizes_ids() -> None:
     assert _stringify_geodata_id_value(1) == "1"
     assert _stringify_geodata_id_value(1.0) == "1"
     assert _stringify_geodata_id_value(1.5) == "1.5"
-    # Nicht-leere Strings werden unverändert zurückgegeben (ohne Trim).
+    # Non-empty strings are returned unchanged (without trimming).
     assert _stringify_geodata_id_value("  ") == "  "
     assert _stringify_geodata_id_value("ABC") == "ABC"
 
@@ -41,5 +41,5 @@ def test_collect_geodata_id_values_uses_geodata_id_columns() -> None:
         lookup_by_source=lookup_by_source,
     )
 
-    # Für "nuts" werden id_nuts/id_ars als geodata_id_nuts/_ars exportiert.
+    # For "nuts", id_nuts/id_ars are exported as geodata_id_nuts/_ars.
     assert values == {"geodata_id_nuts": "DE001", "geodata_id_ars": "01001"}

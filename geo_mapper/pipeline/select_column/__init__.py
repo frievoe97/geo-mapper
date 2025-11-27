@@ -86,7 +86,7 @@ def _prompt_value_renames(
 
     renames: dict[str, str] = {}
     for col in value_columns:
-        # Beispiele analog zur Spaltenauswahl anzeigen
+        # Show examples similar to the column selection step
         samples = _first_non_empty_values(dataframe[col], max_examples=3)
         if not samples:
             samples = [str(col)]
